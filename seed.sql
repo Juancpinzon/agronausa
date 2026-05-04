@@ -1,0 +1,26 @@
+-- Seed data for Agronausa
+-- 8 categorías y 10 productos de muestra
+
+INSERT INTO categories (id, name, slug, description, image_url, sort_order, active)
+VALUES
+  ('0f7d2d50-cd54-4b1c-8aaf-2a9f9c4c9a61', 'Insumos agrícolas', 'insumos-agricolas', 'Herramientas y complementos para cultivos productivos.', 'https://via.placeholder.com/800x500.png?text=Insumos+Agr%C3%ADcolas', 1, true),
+  ('a8e4c060-4d7d-4fef-b6f7-ccf0d5fd5e96', 'Semillas y material vegetal', 'semillas-material-vegetal', 'Semillas certificadas y material para siembra.', 'https://via.placeholder.com/800x500.png?text=Semillas', 2, true),
+  ('3b1f8f7b-9a24-4d12-bd18-2d94d1c8f8de', 'Herramientas', 'herramientas', 'Equipos manuales y herramientas para el campo.', 'https://via.placeholder.com/800x500.png?text=Herramientas', 3, true),
+  ('7e4c6a12-1f6d-4fc7-a5ca-9b7d6c297925', 'Fertilizantes', 'fertilizantes', 'Fertilizantes orgánicos y químicos para todo tipo de cultivos.', 'https://via.placeholder.com/800x500.png?text=Fertilizantes', 4, true),
+  ('d3c2a9f4-442d-4c37-9bc2-0d1a2e3b4f5a', 'Plaguicidas', 'plaguicidas', 'Protege tus cultivos frente a plagas y enfermedades.', 'https://via.placeholder.com/800x500.png?text=Plaguicidas', 5, true),
+  ('6b5e4d3c-2f1a-4d7b-8c9e-0a1b2c3d4e5f', 'Equipos de riego', 'equipos-riego', 'Sistemas eficientes de riego para tus parcelas.', 'https://via.placeholder.com/800x500.png?text=Riego', 6, true),
+  ('5d6a7c8b-9e10-4f2a-b3c4-d5e6f7a8b9c0', 'Alimentos para animales', 'alimentos-para-animales', 'Forrajes y concentrados para ganado y aves.', 'https://via.placeholder.com/800x500.png?text=Alimentos+Animales', 7, true),
+  ('f0e1d2c3-b4a5-4d6e-8f91-0a2b3c4d5e6f', 'Otros', 'otros', 'Productos variados para el agro y la finca.', 'https://via.placeholder.com/800x500.png?text=Otros', 8, true);
+
+INSERT INTO products (id, name, slug, description, category_id, price_retail, unit, min_wholesale_qty, stock, images, active, featured)
+VALUES
+  ('046e4b3f-8c01-4b34-9a7b-e2f0d8c5b4a7', 'Fertilizante granular 10-10-10', 'fertilizante-granular-10-10-10', 'Fertilizante equilibrado para suelos agrícolas de rendimiento alto.', (SELECT id FROM categories WHERE slug = 'fertilizantes'), 52000, 'kg', 10, 50, ARRAY['https://via.placeholder.com/800x500.png?text=Fertilizante+10-10-10'], true, true),
+  ('8c7d9a1b-2f30-4de8-a7f2-0c3b4d5e6f1a', 'Semilla de maíz híbrido', 'semilla-de-maiz-hibrido', 'Semilla de maíz resistente y de alto rendimiento.', (SELECT id FROM categories WHERE slug = 'semillas-material-vegetal'), 42000, 'bolsa 25kg', 1, 60, ARRAY['https://via.placeholder.com/800x500.png?text=Semilla+Ma%C3%ADz'], true, true),
+  ('1d2c3b4a-5e6f-4a7d-8c9b-0a1b2c3d4e5f', 'Azadón de mango reforzado', 'azadon-de-mango-reforzado', 'Azadón ergonómico para trabajo pesado en fincas.', (SELECT id FROM categories WHERE slug = 'herramientas'), 68000, 'unidad', null, 35, ARRAY['https://via.placeholder.com/800x500.png?text=Azad%C3%B3n'], true, false),
+  ('9b8a7c6d-5e4f-4a3b-9c0d-1e2f3a4b5c6d', 'Riego por goteo 50m', 'riego-por-goteo-50m', 'Kit de riego por goteo completo para hortalizas y huertos.', (SELECT id FROM categories WHERE slug = 'equipos-riego'), 145000, 'kit', null, 18, ARRAY['https://via.placeholder.com/800x500.png?text=Riego+Goteo'], true, false),
+  ('0a1b2c3d-4e5f-4a6b-9c7d-8e9f0a1b2c3d', 'Herbicida selectivo para pastos', 'herbicida-selectivo-pastos', 'Herbicida para controlar malezas en cultivos de pasto.', (SELECT id FROM categories WHERE slug = 'plaguicidas'), 72000, 'litro', null, 40, ARRAY['https://via.placeholder.com/800x500.png?text=Herbicida'], true, false),
+  ('2f3e4d5c-6b7a-4c8d-9e0f-1a2b3c4d5e6f', 'Pienso concentrado para bovinos', 'pienso-concentrado-bovinos', 'Alimento balanceado para animales de crianza bovina.', (SELECT id FROM categories WHERE slug = 'alimentos-para-animales'), 62000, 'saco 25kg', 2, 42, ARRAY['https://via.placeholder.com/800x500.png?text=Pienso+Bovino'], true, false),
+  ('a7b6c5d4-3e2f-413c-9b0a-1d2e3f4a5b6c', 'Insecticida biológico', 'insecticida-biologico', 'Protección natural contra plagas de hojas y frutos.', (SELECT id FROM categories WHERE slug = 'plaguicidas'), 38000, 'litro', null, 55, ARRAY['https://via.placeholder.com/800x500.png?text=Insecticida'], true, true),
+  ('6f5e4d3c-2b1a-4c7d-9e0f-1a2b3c4d5e6f', 'Manguera para riego 30m', 'manguera-para-riego-30m', 'Manguera flexible para riego manual y sistemas temporales.', (SELECT id FROM categories WHERE slug = 'equipos-riego'), 24000, 'unidad', null, 70, ARRAY['https://via.placeholder.com/800x500.png?text=Manguera+Riego'], true, false),
+  ('5c4b3a2d-1e0f-4d7c-9b8a-0a1b2c3d4e5f', 'Guantes de trabajo reforzados', 'guantes-de-trabajo-reforzados', 'Guantes para campo con refuerzo en palma y dedos.', (SELECT id FROM categories WHERE slug = 'herramientas'), 12000, 'par', null, 95, ARRAY['https://via.placeholder.com/800x500.png?text=Guantes'], true, false),
+  ('4d3c2b1a-0f9e-4d7c-8b6a-5c4d3e2f1a0b', 'Semilla de tomate cherry', 'semilla-de-tomate-cherry', 'Semilla para cultivo de tomate cherry en huertos y terrazas.', (SELECT id FROM categories WHERE slug = 'semillas-material-vegetal'), 22000, 'paquete', 1, 80, ARRAY['https://via.placeholder.com/800x500.png?text=Semilla+Tomate'], true, false);

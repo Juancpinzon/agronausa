@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Fondo circular verde campo -->
+  <circle cx="16" cy="16" r="16" fill="#2D6A1F"/>
+  <!-- Hoja/brote estilizado -->
+  <path d="M16 26 C16 26 8 20 8 13 C8 9.13 11.58 6 16 6 C20.42 6 24 9.13 24 13 C24 20 16 26 16 26Z"
+        fill="#C4853A" opacity="0.9"/>
+  <path d="M16 26 C16 26 16 16 16 10" stroke="#F9F6F0" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M16 17 C16 17 12 14 11 11" stroke="#F9F6F0" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M16 14 C16 14 19 12 20 10" stroke="#F9F6F0" stroke-width="1.2" stroke-linecap="round"/>
+</svg>
