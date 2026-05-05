@@ -7,3 +7,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .vercel
+
+# Imágenes locales de productos (se suben a Supabase Storage, no al repo)
+scripts/product-images/*
+!scripts/product-images/README.md
