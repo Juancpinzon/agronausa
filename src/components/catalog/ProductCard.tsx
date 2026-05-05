@@ -36,7 +36,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         <img
           src={image}
           alt={product.name}
-          className="h-48 w-full object-cover transition duration-300 group-hover:scale-105"
+          className="aspect-[4/5] w-full object-cover transition duration-300 group-hover:scale-105"
         />
       </Link>
 
