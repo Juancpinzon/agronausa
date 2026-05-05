@@ -13,6 +13,7 @@ import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderConfirm from "./pages/OrderConfirm";
 import PoliticaPrivacidad from "./pages/PoliticaPrivacidad";
+import TerminosYCondiciones from "./pages/TerminosYCondiciones";
 import Account from "./pages/Account";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -76,10 +77,18 @@ function App() {
                 }
               />
               <Route
-                path="/politica-privacidad"
+                path="/politica-de-privacidad"
                 element={
                   <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
                     <PoliticaPrivacidad />
+                  </div>
+                }
+              />
+              <Route
+                path="/terminos-y-condiciones"
+                element={
+                  <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                    <TerminosYCondiciones />
                   </div>
                 }
               />
