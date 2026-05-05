@@ -106,6 +106,24 @@ serve(async (req) => {
 
     if (insertError) throw insertError;
 
+    // 6. Insert Consent Record
+    const { error: consentError } = await supabase
+      .from("consent_records")
+      .insert({
+        order_id: data.id,
+        order_number: data.order_number,
+        customer_id: customer_id,
+        customer_email: customer.email,
+        consent_required: consentRequired,
+        consent_marketing: consentMarketing,
+        policy_version: policyVersion,
+      });
+
+    if (consentError) {
+      console.error("Error al guardar el consentimiento:", consentError);
+      throw consentError;
+    }
+
     return new Response(JSON.stringify(data), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
