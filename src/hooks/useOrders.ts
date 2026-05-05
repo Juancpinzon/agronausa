@@ -13,20 +13,11 @@ interface CreateOrderInput {
   customer: CustomerSnapshot;
   shippingAddress: Address;
   notes?: string;
+  consentRequired: boolean;
+  consentMarketing: boolean;
+  policyVersion: string;
 }
 
-async function generateOrderNumber(): Promise<string> {
-  const year = new Date().getFullYear();
-  const prefix = `AGN-${year}-`;
-
-  const { count } = await supabase
-    .from("orders")
-    .select("*", { count: "exact", head: true })
-    .like("order_number", `${prefix}%`);
-
-  const next = (count ?? 0) + 1;
-  return `${prefix}${String(next).padStart(4, "0")}`;
-}
 
 export async function validateStock(
   cartItems: CartItem[]
@@ -58,43 +49,12 @@ export async function validateStock(
 
 export function useOrders() {
   async function createOrder(input: CreateOrderInput): Promise<Order> {
-    const { cartItems, customer, shippingAddress, notes } = input;
-
-    const orderNumber = await generateOrderNumber();
-
-    const items: OrderItem[] = cartItems.map((i) => ({
-      product_id: i.product_id,
-      product_name: i.product_name,
-      quantity: i.quantity,
-      unit: i.unit,
-      price_applied: i.price_applied,
-      subtotal: i.price_applied * i.quantity,
-    }));
-
-    const subtotal = items.reduce((s, i) => s + i.subtotal, 0);
-    const total = subtotal; // no discounts or shipping fee in phase 1
-
-    const { data: { user } } = await supabase.auth.getUser();
-
-    const payload = {
-      order_number: orderNumber,
-      customer_id: user?.id ?? null,
-      customer_snapshot: customer,
-      items,
-      subtotal,
-      total,
-      status: "pendiente",
-      shipping_address: shippingAddress,
-      notes: notes ?? null,
-    };
-
-    const { data, error } = await supabase
-      .from("orders")
-      .insert(payload)
-      .select()
-      .single();
+    const { data, error } = await supabase.functions.invoke("create-order", {
+      body: input,
+    });
 
     if (error) throw new Error(error.message);
+    if (data && data.error) throw new Error(data.error);
 
     return data as Order;
   }

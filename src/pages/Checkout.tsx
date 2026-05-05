@@ -5,6 +5,7 @@ import { useOrders, validateStock } from "../hooks/useOrders";
 import { formatCOP } from "../lib/formatters";
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
+import ConsentCheckboxes, { ConsentState } from "../components/checkout/ConsentCheckboxes";
 import type { StockConflict } from "../types";
 
 interface FormFields {
@@ -41,7 +42,11 @@ export default function Checkout() {
     address_line: "",
     notes: "",
   });
-  const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [consent, setConsent] = useState<ConsentState>({
+    consentRequired: false,
+    consentMarketing: false,
+    policyVersion: "",
+  });
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [stockConflicts, setStockConflicts] = useState<StockConflict[]>([]);
@@ -95,6 +100,9 @@ export default function Checkout() {
           address_line: fields.address_line,
         },
         notes: fields.notes || undefined,
+        consentRequired: consent.consentRequired,
+        consentMarketing: consent.consentMarketing,
+        policyVersion: consent.policyVersion,
       });
 
       // 3. Clear cart and go to confirmation
@@ -296,31 +304,13 @@ export default function Checkout() {
             </label>
           </div>
 
-          {/* Privacy */}
-          <label className="flex cursor-pointer items-start gap-3 rounded-3xl border border-border bg-white p-4 text-sm text-text shadow-sm">
-            <input
-              type="checkbox"
-              checked={privacyAccepted}
-              onChange={(e) => setPrivacyAccepted(e.target.checked)}
-              required
-              className="mt-1 h-5 w-5 rounded border-border text-primary focus:ring-primary"
-            />
-            <span>
-              He leído y acepto la{" "}
-              <Link
-                to="/politica-privacidad"
-                target="_blank"
-                className="font-medium underline text-primary hover:text-primary/80"
-              >
-                política de tratamiento de datos personales
-              </Link>
-            </span>
-          </label>
+          {/* Privacy (Ley 1581/2012) */}
+          <ConsentCheckboxes onChange={setConsent} />
 
           <div className="flex justify-end">
             <Button
               type="submit"
-              disabled={submitting || !privacyAccepted}
+              disabled={submitting || !consent.consentRequired}
               className="min-w-[200px]"
             >
               {submitting ? "Enviando pedido..." : "Confirmar pedido"}
