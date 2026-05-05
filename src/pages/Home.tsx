@@ -5,6 +5,7 @@
 
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { ROUTES } from "../lib/constants";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1600&q=85&auto=format&fit=crop";
@@ -269,7 +270,7 @@ export default function Home() {
               }}
             >
               <Link
-                to="/catalogo"
+                to={ROUTES.catalog}
                 className="agro-cta-btn"
                 style={{
                   display: "inline-flex",
@@ -311,7 +312,7 @@ export default function Home() {
               >
                 ¿Eres distribuidor?{" "}
                 <Link
-                  to="/login"
+                  to={ROUTES.login}
                   style={{
                     color: "#d4e8a0",
                     textDecoration: "underline",
@@ -369,7 +370,7 @@ export default function Home() {
                 {CATEGORIES.map((cat) => (
                   <Link
                     key={cat.slug}
-                    to={`/catalogo?categoria=${cat.slug}`}
+                    to={`${ROUTES.catalog}?categoria=${cat.slug}`}
                     className="agro-cat-card"
                     style={{
                       display: "flex",
@@ -571,7 +572,7 @@ export default function Home() {
               </div>
 
               <Link
-                to="/registro"
+                to={ROUTES.register}
                 style={{
                   position: "relative",
                   zIndex: 1,
