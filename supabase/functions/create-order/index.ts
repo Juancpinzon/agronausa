@@ -84,15 +84,17 @@ serve(async (req) => {
     const payload = {
       order_number: orderNumber,
       customer_id,
-      customer_snapshot: customer,
+      customer_snapshot: {
+        ...customer,
+        consent_marketing: consentMarketing,
+        policy_version: policyVersion,
+      },
       items,
       subtotal,
       total,
       status: "pendiente",
       shipping_address: shippingAddress,
       notes: notes ?? null,
-      consent_marketing: consentMarketing,
-      policy_version: policyVersion,
     };
 
     // 5. Insert Order
