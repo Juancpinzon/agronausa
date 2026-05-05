@@ -111,8 +111,6 @@ serve(async (req) => {
       .from("consent_records")
       .insert({
         order_id: data.id,
-        order_number: data.order_number,
-        customer_id: customer_id,
         customer_email: customer.email,
         consent_required: consentRequired,
         consent_marketing: consentMarketing,
