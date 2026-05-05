@@ -205,11 +205,14 @@ export function useAdminProducts() {
         imageFiles.map((f) => uploadProductImage(existingId, f)),
       );
       const images = [...existingImages, ...newUrls];
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("products")
         .update({ ...formData, slug, images, updated_at: new Date().toISOString() })
-        .eq("id", existingId);
-      if (error) throw new Error(error.message);
+        .eq("id", existingId)
+        .select()
+        .single();
+      if (error) throw new Error("Error saving product: " + error.message);
+      if (!data) throw new Error("Failed to save product. Are you sure you have permission?");
     } else {
       const { data, error } = await supabase
         .from("products")
@@ -239,12 +242,14 @@ export function useAdminProducts() {
   ): Promise<void> {
     const pathPart = imageUrl.split("/product-images/")[1];
     if (pathPart) {
-      await supabase.storage.from("product-images").remove([pathPart]);
+      const { error } = await supabase.storage.from("product-images").remove([decodeURIComponent(pathPart)]);
+      if (error) console.error("Storage remove error:", error);
     }
     const { data } = await supabase.from("products").select("images").eq("id", productId).single();
     if (data) {
       const images = (data.images || []).filter((img: string) => img !== imageUrl);
-      await supabase.from("products").update({ images }).eq("id", productId);
+      const { error } = await supabase.from("products").update({ images }).eq("id", productId);
+      if (error) throw new Error("Error updating DB in removeImage: " + error.message);
     }
     await load();
   }
