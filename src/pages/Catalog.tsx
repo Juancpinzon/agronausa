@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import useProducts from "../hooks/useProducts";
 import ProductGrid from "../components/catalog/ProductGrid";
 import { usePageMeta } from "../hooks/usePageMeta";
@@ -13,6 +15,17 @@ export default function Catalog() {
     loading,
     error,
   } = useProducts();
+
+  const [searchParams] = useSearchParams();
+
+  // Aplica el filtro de categoría desde el query param al montar la página
+  useEffect(() => {
+    const categoriaParam = searchParams.get("categoria");
+    if (categoriaParam) {
+      setSelectedCategory(categoriaParam);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   usePageMeta(
     "Catálogo de productos",
