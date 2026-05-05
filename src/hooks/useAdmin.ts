@@ -236,14 +236,16 @@ export function useAdminProducts() {
   async function removeImage(
     productId: string,
     imageUrl: string,
-    currentImages: string[],
   ): Promise<void> {
     const pathPart = imageUrl.split("/product-images/")[1];
     if (pathPart) {
       await supabase.storage.from("product-images").remove([pathPart]);
     }
-    const images = currentImages.filter((img) => img !== imageUrl);
-    await supabase.from("products").update({ images }).eq("id", productId);
+    const { data } = await supabase.from("products").select("images").eq("id", productId).single();
+    if (data) {
+      const images = (data.images || []).filter((img: string) => img !== imageUrl);
+      await supabase.from("products").update({ images }).eq("id", productId);
+    }
     await load();
   }
 

@@ -93,17 +93,17 @@ export default function Products() {
   async function handleRemoveExisting(
     productId: string,
     url: string,
-    currentImages: string[],
   ) {
     if (!confirm("¿Eliminar esta imagen?")) return;
     try {
-      await removeImage(productId, url, currentImages);
-      if (editing !== "new" && editing) {
-        setEditing({
-          ...editing,
-          images: (editing.images ?? []).filter((img) => img !== url),
-        });
-      }
+      await removeImage(productId, url);
+      setEditing((prev) => {
+        if (!prev || prev === "new") return prev;
+        return {
+          ...prev,
+          images: (prev.images ?? []).filter((img) => img !== url),
+        };
+      });
     } catch (e) {
       setError(String(e));
     }
@@ -321,7 +321,6 @@ export default function Products() {
                           void handleRemoveExisting(
                             (editing as Product).id,
                             url,
-                            existingImages,
                           )
                         }
                         className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-error text-xs text-white"
