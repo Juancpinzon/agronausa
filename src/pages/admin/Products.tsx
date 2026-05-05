@@ -98,6 +98,12 @@ export default function Products() {
     if (!confirm("¿Eliminar esta imagen?")) return;
     try {
       await removeImage(productId, url, currentImages);
+      if (editing !== "new" && editing) {
+        setEditing({
+          ...editing,
+          images: (editing.images ?? []).filter((img) => img !== url),
+        });
+      }
     } catch (e) {
       setError(String(e));
     }
