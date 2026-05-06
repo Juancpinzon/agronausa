@@ -21,7 +21,16 @@ import Dashboard from "./pages/admin/Dashboard";
 import ProductsAdmin from "./pages/admin/Products";
 import OrdersAdmin from "./pages/admin/Orders";
 import CustomersAdmin from "./pages/admin/Customers";
+import Alerts from "./pages/admin/Alerts";
+import Analytics from "./pages/admin/Analytics";
+import Inventory from "./pages/admin/Inventory";
+import Categories from "./pages/admin/Categories";
+import Suppliers from "./pages/admin/Suppliers";
+import Settings from "./pages/admin/Settings";
+import AdminUsers from "./pages/admin/AdminUsers";
 import AdminGuard from "./components/admin/AdminGuard";
+import AdminSidebar from "./components/admin/AdminSidebar";
+import { Outlet } from "react-router-dom";
 import WhatsAppButton from "./components/ui/WhatsAppButton";
 import { runSeedIfEmpty } from "./lib/seed";
 
@@ -128,42 +137,29 @@ function App() {
                 path="/admin"
                 element={
                   <AdminGuard>
-                    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                      <Dashboard />
+                    <div className="flex items-start mx-auto w-full max-w-[1400px]">
+                      <div className="hidden md:block shrink-0 sticky top-[70px] h-[calc(100vh-70px)]">
+                        <AdminSidebar />
+                      </div>
+                      <div className="flex-1 min-w-0 px-4 py-8 sm:px-6 lg:px-8">
+                        <Outlet />
+                      </div>
                     </div>
                   </AdminGuard>
                 }
-              />
-              <Route
-                path="/admin/products"
-                element={
-                  <AdminGuard>
-                    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                      <ProductsAdmin />
-                    </div>
-                  </AdminGuard>
-                }
-              />
-              <Route
-                path="/admin/orders"
-                element={
-                  <AdminGuard>
-                    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                      <OrdersAdmin />
-                    </div>
-                  </AdminGuard>
-                }
-              />
-              <Route
-                path="/admin/customers"
-                element={
-                  <AdminGuard>
-                    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                      <CustomersAdmin />
-                    </div>
-                  </AdminGuard>
-                }
-              />
+              >
+                <Route index element={<Dashboard />} />
+                <Route path="products" element={<ProductsAdmin />} />
+                <Route path="orders" element={<OrdersAdmin />} />
+                <Route path="customers" element={<CustomersAdmin />} />
+                <Route path="alerts" element={<Alerts />} />
+                <Route path="analytics" element={<Analytics />} />
+                <Route path="inventory" element={<Inventory />} />
+                <Route path="categories" element={<Categories />} />
+                <Route path="suppliers" element={<Suppliers />} />
+                <Route path="settings" element={<Settings />} />
+                <Route path="users" element={<AdminUsers />} />
+              </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>

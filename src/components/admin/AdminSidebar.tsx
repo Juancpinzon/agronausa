@@ -1,8 +1,8 @@
 import { NavLink, Link } from "react-router-dom";
+import { useAlerts } from "../../hooks/useAlerts";
 
 export default function AdminSidebar() {
-  // TODO: conectar useAlerts cuando esté disponible.
-  const criticalAlertsCount = 0;
+  const { criticalCount } = useAlerts();
 
   return (
     <aside className="flex h-full w-64 flex-col overflow-y-auto border-r border-border bg-surface">
@@ -31,7 +31,7 @@ export default function AdminSidebar() {
                 to="/admin/alerts"
                 icon="🔔"
                 label="Alertas Críticas"
-                badge={criticalAlertsCount}
+                badge={criticalCount}
               />
             </li>
           </ul>
