@@ -40,7 +40,7 @@ export default function ProductGrid({
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
         />
-        <div className="flex flex-wrap items-center gap-2 rounded-3xl border border-border bg-white/90 p-3 shadow-sm">
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-white/90 p-3 shadow-sm">
           <button
             type="button"
             onClick={() => onCategoryChange("all")}
@@ -74,7 +74,7 @@ export default function ProductGrid({
         <ProductGridSkeleton count={6} />
       ) : products.length === 0 ? (
         /* ── Empty State ─────────────────────────────────────────── */
-        <div className="surface flex flex-col items-center gap-5 rounded-[2rem] p-10 text-center">
+        <div className="surface flex flex-col items-center gap-5 p-10 text-center">
           {/* Ilustración semilla */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -129,7 +129,7 @@ export default function ProductGrid({
                   onCategoryChange("all");
                   onSearchChange("");
                 }}
-                className="min-h-[48px] rounded-full border border-border bg-white px-5 py-2.5 text-sm font-semibold text-text shadow-sm transition hover:bg-slate-50"
+                className="min-h-[48px] rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-semibold text-text shadow-sm transition hover:bg-primary/8 hover:text-primary"
               >
                 Limpiar filtros
               </button>

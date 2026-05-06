@@ -25,7 +25,7 @@ export default function ConsentCheckboxes({ onChange }: ConsentCheckboxesProps) 
   }, [required, marketing, onChange]);
 
   return (
-    <div className="space-y-4 rounded-3xl border border-border bg-white p-5 text-sm text-text shadow-sm">
+    <div className="space-y-4 rounded-xl border border-border bg-surface p-5 text-sm text-text shadow-sm">
       <label className="flex cursor-pointer items-start gap-3">
         <input
           type="checkbox"

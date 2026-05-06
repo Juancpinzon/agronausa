@@ -88,7 +88,7 @@ export default function Register() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center py-12">
         <div className="w-full max-w-md text-center space-y-6">
-          <div className="surface rounded-[2rem] p-8">
+          <div className="surface p-8">
             <span className="text-5xl">✉️</span>
             <h2 className="mt-4 text-xl font-bold text-text">
               ¡Registro exitoso!

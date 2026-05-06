@@ -50,7 +50,7 @@ export default function Catalog() {
       </header>
 
       {error ? (
-        <div className="surface rounded-[2rem] p-8 text-center text-red-600">
+        <div className="surface p-8 text-center text-error">
           {error}
         </div>
       ) : (

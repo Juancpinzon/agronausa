@@ -221,14 +221,14 @@ function OrderCard({
                   <span className="text-text">
                     {item.quantity} {item.unit} × {item.product_name}
                   </span>
-                  <span className="ml-2 shrink-0 font-mono font-medium">
+                  <span className="ml-2 shrink-0 font-display font-bold">
                     {formatCOP(item.subtotal)}
                   </span>
                 </div>
               ))}
               <div className="mt-2 flex justify-between border-t border-border pt-2 text-sm font-semibold">
                 <span>Total</span>
-                <span className="font-mono">{formatCOP(order.total)}</span>
+                <span className="font-display font-bold">{formatCOP(order.total)}</span>
               </div>
             </div>
           </section>

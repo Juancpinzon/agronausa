@@ -187,7 +187,7 @@ export default function Products() {
                 value={form.description}
                 onChange={(e) => setField("description", e.target.value)}
                 rows={3}
-                className="w-full resize-none rounded-3xl border border-border bg-white px-4 py-3 text-sm text-text focus:border-primary focus:outline-none"
+                className="w-full resize-none rounded-xl border border-border bg-white px-4 py-3 text-sm text-text focus:border-primary focus:outline-none"
               />
             </label>
 
