@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useInventory } from '../../hooks/useInventory';
-import { useProducts } from '../../hooks/useProducts';
+import useProducts from '../../hooks/useProducts';
 import { InventoryRow } from '../../components/admin/InventoryRow';
 import { StockAdjustModal } from '../../components/admin/StockAdjustModal';
 import { Product } from '../../types';
 import { Search } from 'lucide-react';
-import { SkeletonLoader } from '../../components/ui/SkeletonLoader';
+import { Skeleton } from '../../components/ui/SkeletonLoader';
 
 export default function Inventory() {
   const { products, loading: productsLoading, refreshProducts } = useProducts();
@@ -46,9 +46,9 @@ export default function Inventory() {
       <div className="p-4 sm:p-6 lg:p-8 space-y-6">
         <h1 className="text-2xl font-display font-bold text-gray-900">Control de Inventario</h1>
         <div className="space-y-4">
-          <SkeletonLoader className="h-12 w-full rounded-lg" />
-          <SkeletonLoader className="h-24 w-full rounded-lg" />
-          <SkeletonLoader className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-12 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg" />
         </div>
       </div>
     );

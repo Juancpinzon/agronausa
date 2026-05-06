@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAlerts } from '../../hooks/useAlerts';
 import { AlertCard } from '../../components/admin/AlertCard';
-import { SkeletonLoader } from '../../components/ui/SkeletonLoader';
+import { Skeleton } from '../../components/ui/SkeletonLoader';
 
 export default function Alerts() {
   const { alerts, loading, criticalCount, warningCount } = useAlerts();
@@ -11,9 +11,9 @@ export default function Alerts() {
       <div className="p-4 sm:p-6 lg:p-8 space-y-6">
         <h1 className="text-2xl font-display font-bold text-gray-900">Alertas Críticas</h1>
         <div className="space-y-4">
-          <SkeletonLoader className="h-24 w-full rounded-lg" />
-          <SkeletonLoader className="h-24 w-full rounded-lg" />
-          <SkeletonLoader className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg" />
+          <Skeleton className="h-24 w-full rounded-lg" />
         </div>
       </div>
     );

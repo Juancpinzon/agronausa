@@ -10,8 +10,7 @@ export default function useProducts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadCatalog() {
+  const loadCatalog = async () => {
       setLoading(true);
       const [categoriesRes, productsRes] = await Promise.all([
         supabase
@@ -39,8 +38,9 @@ export default function useProducts() {
       }
 
       setLoading(false);
-    }
+    };
 
+  useEffect(() => {
     loadCatalog();
   }, []);
 
@@ -84,5 +84,6 @@ export default function useProducts() {
     loading,
     error,
     getProductBySlug,
+    refreshProducts: loadCatalog,
   };
 }

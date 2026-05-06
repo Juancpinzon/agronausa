@@ -16,7 +16,7 @@ export function CategoryForm({ initialData, onSave, onCancel, nextSortOrder }: C
     description: initialData?.description || '',
     image_url: initialData?.image_url || '',
     sort_order: initialData ? initialData.sort_order : nextSortOrder,
-    active: initialData !== undefined ? initialData.active : true,
+    active: initialData ? initialData.active : true,
   });
 
   const [saving, setSaving] = useState(false);

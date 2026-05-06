@@ -163,6 +163,7 @@ export interface Alert {
   title: string;
   description: string;
   action_url: string;
+  created_at: string;
   product_id?: string;
   order_id?: string;
 }

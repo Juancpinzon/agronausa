@@ -19,7 +19,7 @@ export function SupplierForm({ initialData, onSave, onCancel }: SupplierFormProp
     email: initialData?.email || '',
     category_ids: initialData?.category_ids || [],
     notes: initialData?.notes || '',
-    active: initialData !== undefined ? initialData?.active : true,
+    active: initialData ? initialData.active : true,
   });
 
   const [saving, setSaving] = useState(false);
