@@ -36,15 +36,15 @@ export default function Catalog() {
     <div className="space-y-8">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm uppercase tracking-[0.3em] text-accent">
+          <p className="font-ui text-[11px] font-medium uppercase tracking-[0.14em] text-accent">
             Catálogo
           </p>
-          <h1 className="text-3xl font-bold text-text">Todos los productos</h1>
+          <h1 className="font-display text-3xl font-bold text-text">Todos los productos</h1>
           <p className="mt-2 text-sm text-text-muted">
             Explora productos agrícolas sin necesidad de iniciar sesión.
           </p>
         </div>
-        <div className="rounded-3xl bg-surface px-5 py-3 text-sm font-medium text-text shadow-sm">
+        <div className="rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-medium font-ui text-text-muted shadow-sm">
           {loading ? "Cargando..." : `${products.length} productos disponibles`}
         </div>
       </header>

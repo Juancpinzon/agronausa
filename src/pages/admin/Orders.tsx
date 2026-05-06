@@ -14,12 +14,12 @@ const STATUS_TABS: Array<{ value: OrderStatus | "todos"; label: string }> = [
 ];
 
 const STATUS_STYLES: Record<OrderStatus, string> = {
-  pendiente: "bg-warning/10 text-warning",
-  confirmado: "bg-blue-100 text-blue-700",
-  en_preparacion: "bg-purple-100 text-purple-700",
-  despachado: "bg-indigo-100 text-indigo-700",
-  entregado: "bg-success/10 text-success",
-  cancelado: "bg-error/10 text-error",
+  pendiente:      "bg-warning/12 text-warning border border-warning/25",
+  confirmado:     "bg-primary/10 text-primary border border-primary/20",
+  en_preparacion: "bg-accent/12 text-accent border border-accent/25",
+  despachado:     "bg-primary/18 text-primary border border-primary/30",
+  entregado:      "bg-success/10 text-success border border-success/25",
+  cancelado:      "bg-error/10 text-error border border-error/20",
 };
 
 const STATUS_LABELS: Record<OrderStatus, string> = {
@@ -53,10 +53,10 @@ export default function Orders() {
   return (
     <div className="space-y-5">
       <header>
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">
+        <p className="font-ui text-[11px] font-medium uppercase tracking-[0.14em] text-accent">
           Admin / Pedidos
         </p>
-        <h1 className="text-3xl font-bold text-text">Pedidos</h1>
+        <h1 className="font-display text-3xl font-bold text-text">Pedidos</h1>
       </header>
 
       {/* Status filter */}
@@ -68,10 +68,10 @@ export default function Orders() {
               setActiveTab(tab.value);
               setExpandedId(null);
             }}
-            className={`min-h-[44px] shrink-0 rounded-full px-4 text-sm font-semibold transition ${
+            className={`min-h-[48px] shrink-0 rounded-full px-4 font-ui text-sm font-semibold transition-colors ${
               activeTab === tab.value
                 ? "bg-primary text-white"
-                : "border border-border bg-surface text-text hover:bg-bg"
+                : "border border-border bg-surface text-text hover:bg-primary/8 hover:text-primary hover:border-primary/20"
             }`}
           >
             {tab.label}
@@ -183,8 +183,10 @@ function OrderCard({
             {itemCount === 1 ? "1 producto" : `${itemCount} productos`}
           </p>
         </div>
-        <span className="shrink-0 text-lg text-text-muted">
-          {expanded ? "↑" : "↓"}
+        <span className="shrink-0 text-text-muted transition-transform duration-200" style={{ display: 'inline-block', transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
         </span>
       </button>
 
@@ -307,7 +309,7 @@ function OrderCard({
 
 function SectionLabel({ children }: { children: string }) {
   return (
-    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-muted">
+    <p className="mb-2 font-ui text-[10px] font-semibold uppercase tracking-[0.12em] text-text-muted">
       {children}
     </p>
   );
