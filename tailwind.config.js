@@ -15,7 +15,8 @@ export default {
         warning: "#E67E22",
       },
       fontFamily: {
-        display: ["Plus Jakarta Sans", "sans-serif"],
+        display: ["Fraunces", "Georgia", "serif"],
+        ui: ["Plus Jakarta Sans", "sans-serif"],
         body: ["Inter", "sans-serif"],
       },
     },

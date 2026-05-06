@@ -47,7 +47,7 @@ export default function ProductGrid({
             className={`min-h-[44px] rounded-full px-4 py-2 text-sm font-semibold transition ${
               selectedCategory === "all"
                 ? "bg-primary text-white"
-                : "bg-surface text-text hover:bg-slate-100"
+                : "bg-surface text-text hover:bg-primary/8 hover:text-primary"
             }`}
           >
             Todas
@@ -60,7 +60,7 @@ export default function ProductGrid({
               className={`min-h-[44px] rounded-full px-4 py-2 text-sm font-semibold transition ${
                 selectedCategory === category.slug
                   ? "bg-primary text-white"
-                  : "bg-surface text-text hover:bg-slate-100"
+                  : "bg-surface text-text hover:bg-primary/8 hover:text-primary"
               }`}
             >
               {category.name}

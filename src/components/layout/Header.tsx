@@ -7,6 +7,42 @@ const navItems = [
   { label: "Catálogo", to: "/catalog" },
 ];
 
+function LeafMark() {
+  return (
+    <svg
+      width="28"
+      height="28"
+      viewBox="0 0 28 28"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle cx="14" cy="14" r="14" fill="#2D6A1F" opacity="0.08" />
+      <path
+        d="M14 22C14 22 8 17.5 8 12.5C8 9.46 10.69 7 14 7C17.31 7 20 9.46 20 12.5C20 17.5 14 22 14 22Z"
+        fill="#2D6A1F"
+      />
+      <path
+        d="M14 22L14 11"
+        stroke="#F9F6F0"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <path
+        d="M14 15.5C14 15.5 11.5 13.5 10.5 11"
+        stroke="#F9F6F0"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+      <path
+        d="M14 13C14 13 16 11.5 16.5 9.5"
+        stroke="#F9F6F0"
+        strokeWidth="1.3"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export default function Header() {
   const { itemCount, openCart } = useCart();
   const { user, profile, logout } = useAuth();
@@ -16,24 +52,30 @@ export default function Header() {
     (user?.app_metadata?.role as string | undefined) === "admin";
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-white/90 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-2 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 border-b border-border bg-bg/95 backdrop-blur-md">
+      <div className="mx-auto flex max-w-7xl items-center gap-6 px-4 py-3 sm:px-6 lg:px-8">
         {/* Logo */}
-        <NavLink className="text-xl font-bold text-text" to="/">
-          Agronausa
+        <NavLink
+          to="/"
+          className="flex shrink-0 items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-lg"
+        >
+          <LeafMark />
+          <span className="font-display text-[1.15rem] font-bold tracking-tight text-text">
+            Agronausa
+          </span>
         </NavLink>
 
-        {/* Desktop nav — tight, right after logo */}
+        {/* Desktop nav */}
         <nav className="hidden flex-1 items-center gap-0.5 md:flex">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `rounded-full px-3 py-2 text-sm font-medium transition ${
+                `rounded-full px-3.5 py-2 text-sm font-medium font-ui transition-colors ${
                   isActive
                     ? "bg-primary text-white"
-                    : "text-text hover:bg-slate-100"
+                    : "text-text hover:bg-primary/8 hover:text-primary"
                 }`
               }
             >
@@ -44,7 +86,7 @@ export default function Header() {
             <NavLink
               to="/admin"
               className={({ isActive }) =>
-                `rounded-full px-3 py-2 text-sm font-medium transition ${
+                `rounded-full px-3.5 py-2 text-sm font-medium font-ui transition-colors ${
                   isActive
                     ? "bg-accent text-white"
                     : "text-accent hover:bg-accent/10"
@@ -58,18 +100,17 @@ export default function Header() {
 
         {/* Right side actions */}
         <div className="ml-auto flex items-center gap-1">
-          {/* Auth — desktop only */}
           {user ? (
             <div className="hidden items-center gap-1 md:flex">
               <Link
                 to="/account"
-                className="rounded-full px-3 py-2 text-sm font-medium text-text transition hover:bg-slate-100"
+                className="rounded-full px-3.5 py-2 text-sm font-medium font-ui text-text transition-colors hover:bg-primary/8 hover:text-primary"
               >
                 {profile?.full_name?.split(" ")[0] ?? "Mi cuenta"}
               </Link>
               <button
                 onClick={() => void logout()}
-                className="rounded-full px-3 py-2 text-sm font-medium text-text-muted transition hover:bg-slate-100"
+                className="rounded-full px-3.5 py-2 text-sm font-medium font-ui text-text-muted transition-colors hover:bg-primary/8 hover:text-text"
               >
                 Salir
               </button>
@@ -77,7 +118,7 @@ export default function Header() {
           ) : (
             <Link
               to="/login"
-              className="hidden rounded-full px-3 py-2 text-sm font-medium text-text transition hover:bg-slate-100 md:block"
+              className="hidden rounded-full px-3.5 py-2 text-sm font-medium font-ui text-text transition-colors hover:bg-primary/8 hover:text-primary md:block"
             >
               Ingresar
             </Link>
@@ -87,7 +128,7 @@ export default function Header() {
           <button
             onClick={openCart}
             aria-label={`Abrir carrito — ${itemCount} ${itemCount === 1 ? "artículo" : "artículos"}`}
-            className="relative flex h-10 w-10 items-center justify-center rounded-full text-text transition hover:bg-slate-100"
+            className="relative flex h-11 w-11 items-center justify-center rounded-full text-text transition-colors hover:bg-primary/8 hover:text-primary"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -95,7 +136,7 @@ export default function Header() {
               viewBox="0 0 24 24"
               strokeWidth={1.8}
               stroke="currentColor"
-              className="h-6 w-6"
+              className="h-[22px] w-[22px]"
             >
               <path
                 strokeLinecap="round"
@@ -104,7 +145,7 @@ export default function Header() {
               />
             </svg>
             {itemCount > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-white">
+              <span className="absolute -right-0.5 -top-0.5 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-accent text-[9px] font-bold leading-none text-white ring-2 ring-bg">
                 {itemCount > 99 ? "99+" : itemCount}
               </span>
             )}
