@@ -140,10 +140,10 @@ export default function Products() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <header>
-          <p className="text-sm uppercase tracking-[0.3em] text-accent">
+          <p className="font-ui text-[11px] font-medium uppercase tracking-[0.14em] text-accent">
             Admin / Productos
           </p>
-          <h1 className="text-3xl font-bold text-text">Productos</h1>
+          <h1 className="font-display text-3xl font-bold text-text">Productos</h1>
         </header>
         {!editing && (
           <Button onClick={openNew} className="shrink-0">
@@ -197,7 +197,7 @@ export default function Products() {
                 value={form.category_id}
                 onChange={(e) => setField("category_id", e.target.value)}
                 required
-                className="w-full rounded-3xl border border-border bg-white px-4 py-3 text-sm text-text focus:border-primary focus:outline-none"
+                className="w-full rounded-xl border border-border bg-white px-4 py-3 font-body text-sm text-text shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
               >
                 <option value="">Seleccionar...</option>
                 {categories.map((cat) => (
@@ -219,7 +219,7 @@ export default function Products() {
                   }
                   required
                   min={0}
-                  className="w-full rounded-3xl border border-border bg-white px-4 py-3 text-sm text-text focus:border-primary focus:outline-none"
+                  className="w-full rounded-xl border border-border bg-white px-4 py-3 font-body text-sm text-text shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
                 />
               </label>
               <label className="block space-y-2 text-sm">
@@ -234,7 +234,7 @@ export default function Products() {
                     )
                   }
                   min={0}
-                  className="w-full rounded-3xl border border-border bg-white px-4 py-3 text-sm text-text focus:border-primary focus:outline-none"
+                  className="w-full rounded-xl border border-border bg-white px-4 py-3 font-body text-sm text-text shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
                 />
               </label>
             </div>
@@ -245,7 +245,7 @@ export default function Products() {
                 <select
                   value={form.unit}
                   onChange={(e) => setField("unit", e.target.value)}
-                  className="w-full rounded-3xl border border-border bg-white px-4 py-3 text-sm text-text focus:border-primary focus:outline-none"
+                  className="w-full rounded-xl border border-border bg-white px-4 py-3 font-body text-sm text-text shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
                 >
                   {UNITS.map((u) => (
                     <option key={u} value={u}>
@@ -266,7 +266,7 @@ export default function Products() {
                     )
                   }
                   min={1}
-                  className="w-full rounded-3xl border border-border bg-white px-4 py-3 text-sm text-text focus:border-primary focus:outline-none"
+                  className="w-full rounded-xl border border-border bg-white px-4 py-3 font-body text-sm text-text shadow-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
                 />
               </label>
             </div>
@@ -365,7 +365,7 @@ export default function Products() {
               />
               <label
                 htmlFor="img-upload"
-                className="flex min-h-[48px] cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-border text-sm text-text-muted transition hover:border-primary hover:text-primary"
+                className="flex min-h-[48px] cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border font-ui text-sm text-text-muted transition hover:border-primary hover:text-primary"
               >
                 📷 Agregar fotos
               </label>
@@ -405,7 +405,7 @@ export default function Products() {
             <button
               key={product.id}
               onClick={() => openEdit(product)}
-              className="surface flex w-full items-center gap-3 p-3 text-left transition-shadow hover:shadow-md active:opacity-80"
+              className="surface flex w-full items-center gap-3 p-3 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_20px_rgba(45,106,31,0.12)] active:translate-y-0"
             >
               <div className="h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-bg">
                 {product.images[0] ? (
@@ -441,7 +441,7 @@ export default function Products() {
                   {product.category?.name}
                 </p>
                 <div className="mt-0.5 flex items-center gap-3">
-                  <span className="font-mono text-sm font-semibold">
+                  <span className="font-display text-sm font-bold">
                     {formatCOP(product.price_retail)}
                   </span>
                   <span

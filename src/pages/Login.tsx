@@ -36,10 +36,10 @@ export default function Login() {
     <div className="flex min-h-[60vh] items-center justify-center py-12">
       <div className="w-full max-w-md space-y-8">
         <header className="text-center">
-          <p className="text-sm uppercase tracking-[0.3em] text-accent">
+          <p className="font-ui text-[11px] font-medium uppercase tracking-[0.14em] text-accent">
             Bienvenido
           </p>
-          <h1 className="mt-1 text-3xl font-bold text-text">Iniciar sesión</h1>
+          <h1 className="font-display mt-1 text-3xl font-bold text-text">Iniciar sesión</h1>
           <p className="mt-2 text-sm text-text-muted">
             ¿No tienes cuenta?{" "}
             <Link
@@ -53,7 +53,7 @@ export default function Login() {
 
         <form
           onSubmit={handleSubmit}
-          className="surface rounded-[2rem] p-8 space-y-5"
+          className="surface p-8 space-y-5"
         >
           {error && (
             <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">

@@ -26,7 +26,7 @@ export default function OrderConfirm() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-8 py-8">
-      <div className="surface rounded-[2rem] p-8 text-center space-y-4">
+      <div className="surface p-8 text-center space-y-4">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-success/10">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -44,10 +44,10 @@ export default function OrderConfirm() {
           </svg>
         </div>
 
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">
+        <p className="font-ui text-[11px] font-medium uppercase tracking-[0.14em] text-accent">
           Confirmación
         </p>
-        <h1 className="text-4xl font-bold text-text">¡Pedido recibido!</h1>
+        <h1 className="font-display text-4xl font-bold text-text">¡Pedido recibido!</h1>
 
         {s.customerName && (
           <p className="text-text-muted">
@@ -57,11 +57,11 @@ export default function OrderConfirm() {
         )}
 
         {/* Order number highlight */}
-        <div className="mx-auto mt-2 inline-block rounded-3xl bg-primary/5 px-8 py-4">
-          <p className="text-xs uppercase tracking-[0.25em] text-text-muted">
+        <div className="mx-auto mt-2 inline-block rounded-xl border border-primary/15 bg-primary/5 px-8 py-4">
+          <p className="font-ui text-[10px] font-medium uppercase tracking-[0.18em] text-text-muted">
             Número de pedido
           </p>
-          <p className="mt-1 text-3xl font-bold text-primary font-mono">
+          <p className="font-mono mt-1.5 text-3xl font-bold text-primary">
             {s.orderNumber}
           </p>
         </div>

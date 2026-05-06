@@ -19,7 +19,7 @@ export default function MobileNav() {
   return (
     <>
       {/* Bottom tab bar — only visible on mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-border bg-white/95 backdrop-blur-md md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 flex items-center justify-around border-t border-border bg-bg/95 backdrop-blur-md md:hidden">
         <NavLink
           to="/"
           end

@@ -26,10 +26,10 @@ export default function Customers() {
   return (
     <div className="space-y-6">
       <header>
-        <p className="text-sm uppercase tracking-[0.3em] text-accent">
+        <p className="font-ui text-[11px] font-medium uppercase tracking-[0.14em] text-accent">
           Admin / Clientes
         </p>
-        <h1 className="text-3xl font-bold text-text">Clientes</h1>
+        <h1 className="font-display text-3xl font-bold text-text">Clientes</h1>
       </header>
 
       {loading && (
@@ -68,7 +68,7 @@ export default function Customers() {
                   <button
                     onClick={() => void handleToggle(customer)}
                     disabled={toggling === customer.id}
-                    className={`min-h-[44px] rounded-full px-3 text-xs font-semibold transition ${
+                    className={`min-h-[48px] rounded-full px-3 text-xs font-semibold transition ${
                       customer.has_special_pricing
                         ? "border border-primary/20 bg-primary/10 text-primary"
                         : "border border-border bg-surface text-text-muted hover:bg-bg"
@@ -84,7 +84,7 @@ export default function Customers() {
                   {customer.has_special_pricing && (
                     <button
                       onClick={() => setSelectedCustomer(customer)}
-                      className="min-h-[44px] rounded-full border border-accent/20 bg-accent/10 px-3 text-xs font-semibold text-accent transition hover:bg-accent/20"
+                      className="min-h-[48px] rounded-full border border-accent/20 bg-accent/10 px-3 text-xs font-semibold text-accent transition hover:bg-accent/20"
                     >
                       Gestionar precios
                     </button>
@@ -244,13 +244,13 @@ function SpecialPricingModal({
                           <button
                             onClick={() => void handleSave(product.id)}
                             disabled={saving || !priceInput}
-                            className="min-h-[44px] rounded-xl bg-primary px-3 text-sm font-semibold text-white disabled:opacity-50"
+                            className="min-h-[48px] rounded-xl bg-primary px-3 text-sm font-semibold text-white disabled:opacity-50"
                           >
                             {saving ? "..." : "Ok"}
                           </button>
                           <button
                             onClick={cancelEdit}
-                            className="min-h-[44px] rounded-xl border border-border px-2 text-sm text-text-muted hover:bg-bg"
+                            className="min-h-[48px] rounded-xl border border-border px-2 text-sm text-text-muted hover:bg-bg"
                           >
                             ✕
                           </button>
@@ -259,14 +259,14 @@ function SpecialPricingModal({
                         <>
                           <button
                             onClick={() => startEdit(product.id)}
-                            className="min-h-[44px] rounded-xl border border-border px-3 text-sm text-text hover:bg-bg"
+                            className="min-h-[48px] rounded-xl border border-border px-3 text-sm text-text hover:bg-bg"
                           >
                             {special ? "Editar" : "Asignar"}
                           </button>
                           {special && (
                             <button
                               onClick={() => void handleDelete(special.id)}
-                              className="min-h-[44px] rounded-xl px-2 text-sm text-error hover:bg-error/10"
+                              className="min-h-[48px] rounded-xl px-2 text-sm text-error hover:bg-error/10"
                             >
                               ✕
                             </button>
