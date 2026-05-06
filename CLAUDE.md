@@ -195,6 +195,19 @@ interface SpecialPricing {
   price: number                 // Precio pactado con ese cliente
   created_at: Date
 }
+
+// Tabla para cumplimiento de Ley 1581 (Protección de Datos)
+interface ConsentRecord {
+  id: string
+  order_id: string              // FK → orders
+  customer_name: string
+  email: string
+  phone: string
+  ip_address: string
+  user_agent: string
+  accepted_at: Date
+  version: string               // Versión de los TyC aceptados
+}
 ```
 
 ---
@@ -393,53 +406,53 @@ VITE_WHATSAPP_NUMBER=573204953114  # Para botón "Consultar por WhatsApp"
 ## 🚀 Orden de Construcción para Claude Code
 
 ### Fase 1: Setup y base (Día 1)
-- [ ] Crear proyecto Vite + React + TypeScript + Tailwind
-- [ ] Configurar Supabase: tablas, RLS básico, Storage bucket para imágenes
-- [ ] Variables de entorno y cliente Supabase
-- [ ] Sistema de diseño: variables CSS, fuentes, componentes UI base (Button, Badge, Input)
-- [ ] Routing básico (React Router): Home, Catalog, Product, Cart, Checkout, Admin
-- [ ] **Criterio de éxito:** La app carga, el router funciona, Supabase conecta sin errores
+- [x] Crear proyecto Vite + React + TypeScript + Tailwind
+- [x] Configurar Supabase: tablas, RLS básico, Storage bucket para imágenes
+- [x] Variables de entorno y cliente Supabase
+- [x] Sistema de diseño: variables CSS, fuentes, componentes UI base (Button, Badge, Input)
+- [x] Routing básico (React Router): Home, Catalog, Product, Cart, Checkout, Admin
+- [x] **Criterio de éxito:** La app carga, el router funciona, Supabase conecta sin errores
 
 ### Fase 2: Catálogo público (Día 2)
-- [ ] `useProducts` hook con fetch, filtro por categoría y búsqueda
-- [ ] `ProductCard` con imagen, nombre, precio, unidad, botón agregar al carrito
-- [ ] `ProductGrid` con filtro de categorías
-- [ ] Página `Catalog.tsx` completa
-- [ ] Página `Product.tsx` con detalle y galería de imágenes
-- [ ] **Criterio de éxito:** Se pueden ver todos los productos, filtrar y buscar sin login
+- [x] `useProducts` hook con fetch, filtro por categoría y búsqueda
+- [x] `ProductCard` con imagen, nombre, precio, unidad, botón agregar al carrito
+- [x] `ProductGrid` con filtro de categorías
+- [x] Página `Catalog.tsx` completa
+- [x] Página `Product.tsx` con detalle y galería de imágenes
+- [x] **Criterio de éxito:** Se pueden ver todos los productos, filtrar y buscar sin login
 
 ### Fase 3: Carrito y pedido (Día 3)
-- [ ] `useCart` hook con localStorage (agregar, quitar, cambiar cantidad)
-- [ ] `CartDrawer` lateral (slide-over en móvil)
-- [ ] Validación de stock en checkout (consulta en tiempo real)
-- [ ] Formulario de checkout con validación
-- [ ] Creación de orden en Supabase + pantalla de confirmación con número AGN-XXXX
-- [ ] **Criterio de éxito:** Un visitante sin cuenta puede hacer un pedido completo de punta a punta
+- [x] `useCart` hook con localStorage (agregar, quitar, cambiar cantidad)
+- [x] `CartDrawer` lateral (slide-over en móvil)
+- [x] Validación de stock en checkout (consulta en tiempo real)
+- [x] Formulario de checkout con validación
+- [x] Creación de orden en Supabase + pantalla de confirmación con número AGN-XXXX
+- [x] **Criterio de éxito:** Un visitante sin cuenta puede hacer un pedido completo de punta a punta
 
 ### Fase 4: Auth y precios B2B (Día 4)
-- [ ] Registro y login (email + password, Supabase Auth)
-- [ ] Formulario de registro con campo `customer_type` (persona / negocio)
-- [ ] `useAuth` hook con perfil y tipo de cliente
-- [ ] Lógica de precios: si el usuario es negocio con `special_pricing`, mostrar precio especial
-- [ ] Página `Account.tsx`: historial de pedidos del cliente
-- [ ] **Criterio de éxito:** Un usuario B2B ve su precio especial en el catálogo, un B2C ve el precio base
+- [x] Registro y login (email + password, Supabase Auth)
+- [x] Formulario de registro con campo `customer_type` (persona / negocio)
+- [x] `useAuth` hook con perfil y tipo de cliente
+- [x] Lógica de precios: si el usuario es negocio con `special_pricing`, mostrar precio especial
+- [x] Página `Account.tsx`: historial de pedidos del cliente
+- [x] **Criterio de éxito:** Un usuario B2B ve su precio especial en el catálogo, un B2C ve el precio base
 
 ### Fase 5: Panel Admin (Día 5-6)
-- [ ] Guard de ruta admin (solo si `role === 'admin'`)
-- [ ] Dashboard con métricas básicas: pedidos hoy, ingresos del mes, productos con bajo stock
-- [ ] `Orders.tsx`: listado con filtros por estado, detalle de pedido, cambio de estado
-- [ ] `Products.tsx`: listado, formulario crear/editar, subida de imágenes a Supabase Storage
-- [ ] `Customers.tsx`: listado de clientes registrados, asignar `has_special_pricing`
-- [ ] Formulario de `SpecialPricing`: asignar precio especial por producto a un cliente B2B
-- [ ] **Criterio de éxito:** David puede gestionar pedidos, subir productos y asignar precios desde su celular
+- [x] Guard de ruta admin (solo si `role === 'admin'`)
+- [x] Dashboard con métricas básicas: pedidos hoy, ingresos del mes, productos con bajo stock
+- [x] `Orders.tsx`: listado con filtros por estado, detalle de pedido, cambio de estado
+- [x] `Products.tsx`: listado, formulario crear/editar, subida de imágenes a Supabase Storage
+- [x] `Customers.tsx`: listado de clientes registrados, asignar `has_special_pricing`
+- [x] Formulario de `SpecialPricing`: asignar precio especial por producto a un cliente B2B
+- [x] **Criterio de éxito:** David puede gestionar pedidos, subir productos y asignar precios desde su celular
 
 ### Fase 6: Pulido y deploy (Día 7)
-- [ ] SEO básico: meta tags, Open Graph, favicon con logo Agronausa
-- [ ] Botón flotante "Consultar por WhatsApp" (usa `VITE_WHATSAPP_NUMBER`)
-- [ ] Estados vacíos, loading skeletons, manejo de errores en UI
-- [ ] Responsive final pass: revisar todo en 375px
-- [ ] Deploy en Vercel con dominio agronausa.com
-- [ ] **Criterio de éxito:** El sitio está publicado, David puede acceder al admin, el primer pedido de prueba funciona
+- [x] SEO básico: meta tags, Open Graph, favicon con logo Agronausa
+- [x] Botón flotante "Consultar por WhatsApp" (usa `VITE_WHATSAPP_NUMBER`)
+- [x] Estados vacíos, loading skeletons, manejo de errores en UI
+- [x] Responsive final pass: revisar todo en 375px
+- [x] Deploy en Vercel con dominio agronausa.com
+- [x] **Criterio de éxito:** El sitio está publicado, David puede acceder al admin, el primer pedido de prueba funciona
 
 ---
 
