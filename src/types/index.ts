@@ -112,3 +112,76 @@ export interface SpecialPricing {
   price: number;
   created_at: string;
 }
+
+// Módulo Inventario
+export interface InventoryMovement {
+  id: string;
+  product_id: string;
+  type: 'entrada' | 'salida' | 'ajuste' | 'pedido';
+  quantity: number;
+  stock_before: number;
+  stock_after: number;
+  reason?: string;
+  order_id?: string;
+  created_by?: string;
+  created_at: string;
+}
+
+// Módulo Proveedores
+export interface Supplier {
+  id: string;
+  name: string;
+  contact_name?: string;
+  phone?: string;
+  email?: string;
+  category_ids: string[];
+  notes?: string;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// Módulo Configuración
+export type AppSettingKey =
+  | 'site_name'
+  | 'whatsapp_number'
+  | 'low_stock_threshold'
+  | 'alert_pending_hours'
+  | 'admin_email'
+  | 'store_department'
+  | 'store_city'
+  | 'store_address'
+  | 'terms_version';
+
+export type AppSettings = Record<AppSettingKey, string>;
+
+// Módulo Alertas
+export interface Alert {
+  id: string;
+  type: 'stock_bajo' | 'pedido_sin_atender' | 'sin_imagen';
+  severity: 'critica' | 'advertencia';
+  title: string;
+  description: string;
+  action_url: string;
+  product_id?: string;
+  order_id?: string;
+}
+
+// Módulo Analytics
+export interface FinancialSummary {
+  revenue_total: number;
+  orders_count: number;
+  avg_ticket: number;
+  orders_by_status: Record<OrderStatus, number>;
+  top_products: Array<{
+    product_name: string;
+    units_sold: number;
+    revenue: number;
+  }>;
+  revenue_by_day: Array<{
+    date: string;
+    revenue: number;
+    orders: number;
+  }>;
+  new_customers: number;
+}
