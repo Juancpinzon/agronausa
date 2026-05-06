@@ -6,14 +6,14 @@
 :root {
   color-scheme: light;
   font-family: "Inter", sans-serif;
-  --color-primary: #2d6a1f;
-  --color-primary-hover: #245517;
-  --color-accent: #c4853a;
-  --color-bg: #f9f6f0;
-  --color-surface: #ffffff;
-  --color-border: #ddd5c8;
-  --color-text: #2c1a0e;
-  --color-text-muted: #7a6553;
+  --color-primary: #3D1F0A;
+  --color-primary-hover: #2C1507;
+  --color-accent: #C4853A;
+  --color-bg: #F7F1E8;
+  --color-surface: #FFFFFF;
+  --color-border: #E2D5C3;
+  --color-text: #1C0F05;
+  --color-text-muted: #7A5C3E;
   --color-success: #3a7d44;
   --color-error: #c0392b;
   --color-warning: #e67e22;

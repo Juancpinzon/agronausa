@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useCategories } from '../../hooks/useCategories';
 import { CategoryForm } from '../../components/admin/CategoryForm';
 import type { Category } from '../../types';
 
 export default function Categories() {
-  const { categories, loading, saveCategory, reorderCategories, deleteCategory } = useCategories();
+  const { categories, loading, saveCategory, reorderCategories, deleteCategory, removeCategoryImage } = useCategories();
   const [editingCategory, setEditingCategory] = useState<Category | null | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSave = async (formData: any, id?: string) => {
+  const handleSave = async (formData: any, imageFile?: File, id?: string) => {
     setError(null);
-    await saveCategory(formData, id);
-    setEditingCategory(undefined);
+    try {
+      await saveCategory(formData, imageFile, id);
+      setEditingCategory(undefined);
+    } catch (err: any) {
+      setError(err.message || 'Error al guardar la categoría');
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -62,7 +66,7 @@ export default function Categories() {
 
       {loading ? (
         <div className="py-12 flex justify-center">
-          <p className="text-text-muted">Cargando categorías...</p>
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
         </div>
       ) : categories.length === 0 ? (
         <div className="surface border border-border p-8 text-center rounded-lg">
@@ -80,7 +84,7 @@ export default function Categories() {
         <div className="space-y-3">
           {categories.map((category, index) => (
             <div key={category.id} className={`surface border ${!category.active ? 'border-border/50 opacity-60' : 'border-border'} p-4 flex flex-col sm:flex-row justify-between sm:items-center gap-4 transition-colors`}>
-              <div className="flex-1 flex items-center gap-3">
+              <div className="flex-1 flex items-center gap-4">
                 <div className="flex flex-col gap-1 shrink-0">
                   <button 
                     onClick={() => moveUp(index)} 
@@ -99,12 +103,26 @@ export default function Categories() {
                     ▼
                   </button>
                 </div>
+
+                <div className="h-14 w-14 shrink-0 overflow-hidden rounded-2xl bg-bg border border-border">
+                  {category.image_url ? (
+                    <img
+                      src={category.image_url}
+                      alt={category.name}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-xl bg-accent/5 text-accent/30">
+                      📂
+                    </div>
+                  )}
+                </div>
                 
                 <div>
                   <h3 className="font-display text-lg font-bold text-text flex items-center gap-2">
-                    ≡ {category.name}
+                    {category.name}
                     {!category.active && (
-                      <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full font-ui uppercase tracking-wider">Inactiva</span>
+                      <span className="text-[10px] bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full font-ui uppercase tracking-wider">Inactiva</span>
                     )}
                   </h3>
                   <p className="text-sm text-text-muted font-mono mt-1">/{category.slug}</p>
@@ -136,6 +154,7 @@ export default function Categories() {
         <CategoryForm 
           initialData={editingCategory}
           onSave={handleSave}
+          onRemoveImage={removeCategoryImage}
           onCancel={() => setEditingCategory(undefined)}
           nextSortOrder={categories.length}
         />

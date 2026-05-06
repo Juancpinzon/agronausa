@@ -11,6 +11,22 @@ export interface CategoryFormData {
   active: boolean;
 }
 
+async function uploadCategoryImage(
+  categoryId: string,
+  file: File,
+): Promise<string> {
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const path = `categories/${categoryId}/${Date.now()}.${ext}`;
+  const { error } = await supabase.storage
+    .from("product-images")
+    .upload(path, file, { upsert: false });
+  if (error) throw new Error(error.message);
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("product-images").getPublicUrl(path);
+  return publicUrl;
+}
+
 export function useCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,18 +50,35 @@ export function useCategories() {
     void load();
   }, [load]);
 
-  async function saveCategory(formData: CategoryFormData, existingId?: string) {
+  async function saveCategory(formData: CategoryFormData, imageFile?: File, existingId?: string) {
+    let categoryId = existingId;
+    let finalImageUrl = formData.image_url;
+
     if (existingId) {
+      if (imageFile) {
+        finalImageUrl = await uploadCategoryImage(existingId, imageFile);
+      }
       const { error } = await supabase
         .from("categories")
-        .update({ ...formData })
+        .update({ ...formData, image_url: finalImageUrl })
         .eq("id", existingId);
       if (error) throw new Error("Error updating category: " + error.message);
     } else {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("categories")
-        .insert({ ...formData });
+        .insert({ ...formData })
+        .select()
+        .single();
       if (error) throw new Error("Error creating category: " + error.message);
+      
+      categoryId = (data as Category).id;
+      if (imageFile) {
+        const publicUrl = await uploadCategoryImage(categoryId, imageFile);
+        await supabase
+          .from("categories")
+          .update({ image_url: publicUrl })
+          .eq("id", categoryId);
+      }
     }
     await load();
   }
@@ -85,5 +118,16 @@ export function useCategories() {
     await load();
   }
 
-  return { categories, loading, saveCategory, reorderCategories, deleteCategory, refresh: load };
+  async function removeCategoryImage(categoryId: string, imageUrl: string) {
+    const pathPart = imageUrl.split("/product-images/")[1];
+    if (pathPart) {
+      const { error } = await supabase.storage.from("product-images").remove([decodeURIComponent(pathPart)]);
+      if (error) console.error("Storage remove error:", error);
+    }
+    const { error } = await supabase.from("categories").update({ image_url: "" }).eq("id", categoryId);
+    if (error) throw new Error("Error updating DB in removeCategoryImage: " + error.message);
+    await load();
+  }
+
+  return { categories, loading, saveCategory, reorderCategories, deleteCategory, removeCategoryImage, refresh: load };
 }

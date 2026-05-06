@@ -74,7 +74,7 @@ export default function Header() {
               className={({ isActive }) =>
                 `rounded-full px-3.5 py-2 text-sm font-medium font-ui transition-colors ${
                   isActive
-                    ? "bg-primary text-white"
+                    ? "text-primary bg-primary/8"
                     : "text-text hover:bg-primary/8 hover:text-primary"
                 }`
               }
@@ -100,6 +100,13 @@ export default function Header() {
 
         {/* Right side actions */}
         <div className="ml-auto flex items-center gap-1">
+          <Link
+            to="/register?type=negocio"
+            className="hidden rounded-full px-3.5 py-2 text-sm font-medium font-ui text-text-muted transition-colors hover:bg-primary/8 hover:text-primary md:block"
+          >
+            Soy distribuidor
+          </Link>
+
           {user ? (
             <div className="hidden items-center gap-1 md:flex">
               <Link

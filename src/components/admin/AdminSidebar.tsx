@@ -1,5 +1,19 @@
 import { NavLink, Link } from "react-router-dom";
 import { useAlerts } from "../../hooks/useAlerts";
+import { 
+  LayoutDashboard, 
+  Bell, 
+  ShoppingCart, 
+  Users, 
+  BarChart, 
+  Package, 
+  FolderTree, 
+  ClipboardList, 
+  Truck, 
+  UserCog, 
+  Settings,
+  Store
+} from "lucide-react";
 
 export default function AdminSidebar() {
   const { criticalCount } = useAlerts();
@@ -10,8 +24,9 @@ export default function AdminSidebar() {
         <h2 className="mb-4 font-display text-xl font-bold text-text">Admin Panel</h2>
         <Link
           to="/"
-          className="flex min-h-[48px] w-full items-center justify-center rounded-lg border border-primary/30 font-ui font-medium text-primary transition-colors hover:bg-primary/8"
+          className="flex min-h-[48px] w-full items-center justify-center gap-2 rounded-lg border border-primary/30 font-ui font-medium text-primary transition-colors hover:bg-primary/8"
         >
+          <Store size={18} />
           Ir a la Tienda
         </Link>
       </div>
@@ -24,12 +39,12 @@ export default function AdminSidebar() {
           </h3>
           <ul className="space-y-1">
             <li>
-              <NavItem to="/admin" icon="📊" label="Tablero (KPIs)" end />
+              <NavItem to="/admin" icon={<LayoutDashboard size={20} />} label="Tablero (KPIs)" end />
             </li>
             <li>
               <NavItem
                 to="/admin/alerts"
-                icon="🔔"
+                icon={<Bell size={20} />}
                 label="Alertas Críticas"
                 badge={criticalCount}
               />
@@ -44,13 +59,13 @@ export default function AdminSidebar() {
           </h3>
           <ul className="space-y-1">
             <li>
-              <NavItem to="/admin/orders" icon="🛒" label="Gestión de Pedidos" />
+              <NavItem to="/admin/orders" icon={<ShoppingCart size={20} />} label="Gestión de Pedidos" />
             </li>
             <li>
-              <NavItem to="/admin/customers" icon="👥" label="Cartera de Clientes" />
+              <NavItem to="/admin/customers" icon={<Users size={20} />} label="Cartera de Clientes" />
             </li>
             <li>
-              <NavItem to="/admin/analytics" icon="📈" label="Análisis Financiero" />
+              <NavItem to="/admin/analytics" icon={<BarChart size={20} />} label="Análisis Financiero" />
             </li>
           </ul>
         </div>
@@ -62,13 +77,13 @@ export default function AdminSidebar() {
           </h3>
           <ul className="space-y-1">
             <li>
-              <NavItem to="/admin/products" icon="📦" label="Productos" />
+              <NavItem to="/admin/products" icon={<Package size={20} />} label="Productos" />
             </li>
             <li>
-              <NavItem to="/admin/categories" icon="📂" label="Categorías" />
+              <NavItem to="/admin/categories" icon={<FolderTree size={20} />} label="Categorías" />
             </li>
             <li>
-              <NavItem to="/admin/inventory" icon="🏷️" label="Inventario" />
+              <NavItem to="/admin/inventory" icon={<ClipboardList size={20} />} label="Inventario" />
             </li>
           </ul>
         </div>
@@ -80,7 +95,7 @@ export default function AdminSidebar() {
           </h3>
           <ul className="space-y-1">
             <li>
-              <NavItem to="/admin/suppliers" icon="🚛" label="Gestión de Proveedores" />
+              <NavItem to="/admin/suppliers" icon={<Truck size={20} />} label="Gestión de Proveedores" />
             </li>
           </ul>
         </div>
@@ -92,10 +107,10 @@ export default function AdminSidebar() {
           </h3>
           <ul className="space-y-1">
             <li>
-              <NavItem to="/admin/users" icon="👤" label="Usuarios y Roles" />
+              <NavItem to="/admin/users" icon={<UserCog size={20} />} label="Usuarios y Roles" />
             </li>
             <li>
-              <NavItem to="/admin/settings" icon="⚙️" label="Configuración Maestra" />
+              <NavItem to="/admin/settings" icon={<Settings size={20} />} label="Configuración Maestra" />
             </li>
           </ul>
         </div>
@@ -112,7 +127,7 @@ function NavItem({
   end,
 }: {
   to: string;
-  icon: string;
+  icon: React.ReactNode;
   label: string;
   badge?: number;
   end?: boolean;
@@ -129,7 +144,7 @@ function NavItem({
         }`
       }
     >
-      <span className="text-xl">{icon}</span>
+      <span className="flex h-5 w-5 items-center justify-center text-current opacity-80">{icon}</span>
       <span className="flex-1 font-ui text-sm">{label}</span>
       {badge !== undefined && badge > 0 && (
         <span className="flex h-5 w-5 items-center justify-center rounded-full bg-error text-[10px] font-bold text-white">

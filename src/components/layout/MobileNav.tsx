@@ -133,6 +133,9 @@ export default function MobileNav() {
               )}
 
               <div className="border-t border-border pt-1 mt-1">
+                <DrawerLink to="/register?type=negocio" onClick={close} accent>
+                  Soy distribuidor
+                </DrawerLink>
                 <DrawerLink to="/catalog" onClick={close}>
                   Catálogo
                 </DrawerLink>

@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import type { CategoryFormData } from '../../hooks/useCategories';
 import type { Category } from '../../types';
 
 interface CategoryFormProps {
   initialData?: Category | null;
-  onSave: (data: CategoryFormData, id?: string) => Promise<void>;
+  onSave: (data: CategoryFormData, imageFile?: File, id?: string) => Promise<void>;
+  onRemoveImage?: (id: string, url: string) => Promise<void>;
   onCancel: () => void;
   nextSortOrder: number;
 }
 
-export function CategoryForm({ initialData, onSave, onCancel, nextSortOrder }: CategoryFormProps) {
+export function CategoryForm({ initialData, onSave, onRemoveImage, onCancel, nextSortOrder }: CategoryFormProps) {
   const [formData, setFormData] = useState<CategoryFormData>({
     name: initialData?.name || '',
     slug: initialData?.slug || '',
@@ -19,14 +20,16 @@ export function CategoryForm({ initialData, onSave, onCancel, nextSortOrder }: C
     active: initialData ? initialData.active : true,
   });
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   // Auto-generate slug from name if not manually edited
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
     setFormData(prev => {
-      // If slug was empty or matched the old generated slug, auto-update it
       const oldGeneratedSlug = prev.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
       const shouldUpdateSlug = !prev.slug || prev.slug === oldGeneratedSlug;
       
@@ -38,6 +41,29 @@ export function CategoryForm({ initialData, onSave, onCancel, nextSortOrder }: C
           : prev.slug
       };
     });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemoveExistingImage = async () => {
+    if (!initialData?.id || !formData.image_url || !onRemoveImage) return;
+    if (!confirm('¿Eliminar la imagen actual?')) return;
+    
+    try {
+      setSaving(true);
+      await onRemoveImage(initialData.id, formData.image_url);
+      setFormData(prev => ({ ...prev, image_url: '' }));
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,7 +80,7 @@ export function CategoryForm({ initialData, onSave, onCancel, nextSortOrder }: C
     setSaving(true);
     setError(null);
     try {
-      await onSave(formData, initialData?.id);
+      await onSave(formData, imageFile || undefined, initialData?.id);
     } catch (err: any) {
       setError(err.message || 'Error al guardar la categoría');
       setSaving(false);
@@ -104,19 +130,43 @@ export function CategoryForm({ initialData, onSave, onCancel, nextSortOrder }: C
               className="w-full border border-border rounded p-2 text-text focus:outline-none focus:border-primary font-mono text-sm"
               placeholder="ej-semillas"
             />
-            <p className="text-xs text-text-muted mt-1">Debe ser único, sin espacios ni caracteres especiales.</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-text mb-1">URL de la Imagen (opcional)</label>
+            <label className="block text-sm font-medium text-text mb-2">Foto de la categoría</label>
+            
+            {/* Existing or new preview */}
+            {(formData.image_url || imagePreview) && (
+              <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-border mb-3">
+                <img 
+                  src={imagePreview || formData.image_url} 
+                  alt="Vista previa" 
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={imagePreview ? () => { setImagePreview(null); setImageFile(null); } : handleRemoveExistingImage}
+                  className="absolute top-2 right-2 bg-error text-white h-8 w-8 rounded-full flex items-center justify-center shadow-lg"
+                >
+                  ×
+                </button>
+              </div>
+            )}
+
             <input 
-              type="text" 
-              value={formData.image_url}
-              onChange={e => setFormData({ ...formData, image_url: e.target.value })}
-              className="w-full border border-border rounded p-2 text-text focus:outline-none focus:border-primary text-sm"
-              placeholder="https://..."
+              ref={fileRef}
+              type="file" 
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+              id="cat-img-upload"
             />
-            <p className="text-xs text-text-muted mt-1">Para la fase actual puedes dejarlo en blanco o usar una URL externa.</p>
+            <label 
+              htmlFor="cat-img-upload"
+              className="flex items-center justify-center gap-2 w-full p-4 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary hover:text-primary transition-colors text-sm font-ui text-text-muted"
+            >
+              📷 {formData.image_url || imagePreview ? 'Cambiar foto' : 'Subir foto'}
+            </label>
           </div>
 
           <div>
