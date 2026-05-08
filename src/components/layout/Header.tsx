@@ -66,14 +66,14 @@ export default function Header() {
           </span>
         </NavLink>
 
-        {/* Desktop nav */}
-        <nav className="hidden flex-1 items-center gap-0.5 md:flex">
+        {/* Nav principal - visible en cualquier posición */}
+        <nav className="flex flex-1 items-center gap-0.5 sm:gap-1">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
-                `rounded-full px-3.5 py-2 text-sm font-medium font-ui transition-colors ${
+                `rounded-full px-2 py-1.5 text-[13px] sm:px-3.5 sm:py-2 sm:text-sm font-medium font-ui transition-colors ${
                   isActive
                     ? "text-primary bg-primary/8"
                     : "text-text hover:bg-primary/8 hover:text-primary"
@@ -87,7 +87,7 @@ export default function Header() {
             <NavLink
               to="/admin"
               className={({ isActive }) =>
-                `rounded-full px-3.5 py-2 text-sm font-medium font-ui transition-colors ${
+                `rounded-full px-2 py-1.5 text-[13px] sm:px-3.5 sm:py-2 sm:text-sm font-medium font-ui transition-colors ${
                   isActive
                     ? "bg-accent text-white"
                     : "text-accent hover:bg-accent/10"
