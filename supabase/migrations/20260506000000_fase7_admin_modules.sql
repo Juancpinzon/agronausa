@@ -1,30 +1,30 @@
 -- 1. Historial de movimientos de inventario
-CREATE TABLE inventory_movements (
-  id          uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  product_id  uuid NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-  type        text NOT NULL CHECK (type IN ('entrada', 'salida', 'ajuste', 'pedido')),
-  quantity    integer NOT NULL,          -- positivo = entrada, negativo = salida/ajuste
+CREATE TABLE IF NOT EXISTS inventory_movements (
+  id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  product_id   uuid NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  type         text NOT NULL CHECK (type IN ('entrada', 'salida', 'ajuste', 'pedido')),
+  quantity     integer NOT NULL,
   stock_before integer NOT NULL,
   stock_after  integer NOT NULL,
-  reason      text,                      -- descripción del ajuste manual
-  order_id    uuid REFERENCES orders(id), -- FK si el movimiento viene de un pedido
-  created_by  uuid REFERENCES auth.users(id),
-  created_at  timestamptz DEFAULT now()
+  reason       text,
+  order_id     uuid REFERENCES orders(id),
+  created_by   uuid REFERENCES auth.users(id),
+  created_at   timestamptz DEFAULT now()
 );
 
--- RLS: solo admin puede leer y escribir
 ALTER TABLE inventory_movements ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "admin_all" ON inventory_movements;
 CREATE POLICY "admin_all" ON inventory_movements
-  USING (auth.jwt() ->> 'role' = 'admin');
+  USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
 
 -- 2. Proveedores
-CREATE TABLE suppliers (
+CREATE TABLE IF NOT EXISTS suppliers (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   name         text NOT NULL,
   contact_name text,
   phone        text,
   email        text,
-  category_ids uuid[],                  -- categorías que provee
+  category_ids uuid[],
   notes        text,
   active       boolean DEFAULT true,
   created_at   timestamptz DEFAULT now(),
@@ -32,20 +32,22 @@ CREATE TABLE suppliers (
 );
 
 ALTER TABLE suppliers ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "admin_all" ON suppliers;
 CREATE POLICY "admin_all" ON suppliers
-  USING (auth.jwt() ->> 'role' = 'admin');
+  USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
 
 -- 3. Configuración maestra (clave-valor)
-CREATE TABLE app_settings (
+CREATE TABLE IF NOT EXISTS app_settings (
   key        text PRIMARY KEY,
   value      text NOT NULL,
   updated_at timestamptz DEFAULT now()
 );
 
 ALTER TABLE app_settings ENABLE ROW LEVEL SECURITY;
--- Admin puede leer y escribir; público puede leer claves no sensibles
+DROP POLICY IF EXISTS "admin_write" ON app_settings;
 CREATE POLICY "admin_write" ON app_settings
-  FOR ALL USING (auth.jwt() ->> 'role' = 'admin');
+  FOR ALL USING ((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin');
+DROP POLICY IF EXISTS "public_read" ON app_settings;
 CREATE POLICY "public_read" ON app_settings
   FOR SELECT USING (key NOT IN ('admin_email', 'service_notes'));
 
@@ -59,4 +61,5 @@ INSERT INTO app_settings (key, value) VALUES
   ('store_department', 'Cundinamarca'),
   ('store_city', 'Bogotá'),
   ('store_address', ''),
-  ('terms_version', '1.0');
+  ('terms_version', '1.0')
+ON CONFLICT (key) DO NOTHING;

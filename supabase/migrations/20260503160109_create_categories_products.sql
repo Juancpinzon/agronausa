@@ -29,11 +29,13 @@ create table if not exists products (
   updated_at timestamptz not null default now()
 );
 
--- Enable row level security for public read access
+-- Enable row level security
 alter table categories enable row level security;
-create policy "Public read categories" on categories
-  for select using (true);
-
 alter table products enable row level security;
-create policy "Public read products" on products
-  for select using (true);
+
+-- Drop policies if they exist, then recreate
+drop policy if exists "Public read categories" on categories;
+create policy "Public read categories" on categories for select using (true);
+
+drop policy if exists "Public read products" on products;
+create policy "Public read products" on products for select using (true);

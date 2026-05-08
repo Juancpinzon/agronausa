@@ -18,14 +18,17 @@ create table if not exists orders (
 alter table orders enable row level security;
 
 -- Anyone (including anonymous guests) can create an order
+drop policy if exists "Anyone can create orders" on orders;
 create policy "Anyone can create orders" on orders
   for insert with check (true);
 
 -- Authenticated users can read their own orders
+drop policy if exists "Customers see own orders" on orders;
 create policy "Customers see own orders" on orders
   for select using (customer_id = auth.uid());
 
 -- Admins can read and update all orders (role set in user metadata)
+drop policy if exists "Admins manage orders" on orders;
 create policy "Admins manage orders" on orders
   for all using (
     (auth.jwt() -> 'user_metadata' ->> 'role') = 'admin'

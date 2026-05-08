@@ -1,94 +1,134 @@
-# CLAUDE.md — Agronausa
-## Plataforma e-commerce para productos agropecuarios con clientes B2C y B2B
+# CLAUDE.md — TradeOS Personal
+## Plataforma web de inversiones y trading NYSE + Cripto
 
-> Lee este archivo completo antes de escribir una sola línea de código. Cada decisión de arquitectura tiene una razón de negocio. No la ignores.
+> **Agente**: Lee este archivo completo antes de escribir cualquier línea de código. Es tu contrato de comportamiento para todo el proyecto.
 
 ---
 
 ## 🧠 Contexto del Negocio
 
-**Cliente:** David Nausa — Agronausa, negocio agropecuario colombiano.
+TradeOS Personal es una plataforma de inversiones y trading unificada para un usuario individual (uso personal). Centraliza NYSE (via Alpaca) y cripto (via Binance) en una sola interfaz, con análisis asistido por Claude API.
 
-**Problema actual:** El catálogo vive únicamente en WhatsApp Business. Los clientes no pueden explorar productos sin escribirle, los pedidos se gestionan manualmente por chat, no hay historial de compras ni control de inventario.
+**El problema que resuelve**: las plataformas de brokers son fragmentadas, sin análisis inteligente integrado, y sin visión unificada de portafolio multi-activo.
 
-**Solución:** Tienda web completa con catálogo público, carrito, pedidos y panel admin. Basada en la arquitectura de BSM, adaptada al contexto agropecuario y a la dualidad B2C (personas naturales) / B2B (negocios y distribuidores).
+**Usuario**: trader/inversor individual con cuenta Alpaca paper/live y cuenta Binance.
 
-**Usuario final:** Dos perfiles distintos que conviven en la misma plataforma:
-- **Persona natural**: compra por unidad o pequeñas cantidades, navega sin cuenta, paga al momento.
-- **Negocio / distribuidor**: requiere precios especiales, compra por volumen, puede tener crédito o condiciones pactadas.
+**Flujo que NUNCA puede bloquearse**: ver el estado actual del portafolio.
 
 ---
 
 ## 🎯 Principios de Diseño Irrompibles
 
-1. **El catálogo es siempre visible sin registro.** Cualquier visitante puede ver productos y precios base. El registro solo se exige al hacer el pedido. Razón: reemplaza el catálogo de WhatsApp — si hay fricción al entrar, el cliente vuelve al chat.
+1. **Las API keys nunca tocan el frontend.** Todas las llamadas a Alpaca y Binance se hacen desde Supabase Edge Functions. El cliente solo llama a Supabase.
 
-2. **El precio mostrado es el precio cobrado.** No hay precios que cambien en checkout sin aviso explícito. Si un producto B2B tiene precio diferente, se muestra al usuario B2B autenticado, nunca se cambia silenciosamente. Razón: confianza del cliente.
+2. **Paper trading por defecto en Fase 1.** Ninguna orden real se ejecuta hasta que el módulo live trading esté explícitamente activado y probado.
 
-3. **Un cliente B2B nunca ve precios de otro cliente B2B.** Las condiciones especiales son por cuenta, nunca globales. Razón: evitar conflictos entre distribuidores con márgenes distintos.
+3. **El dashboard carga en < 2s.** Los datos de mercado se cachean en Supabase; nunca se llama directo a brokers desde el render del dashboard.
 
-4. **El stock nunca queda en negativo.** Si un producto se agota durante el proceso de pedido, se notifica antes del checkout, no después. Razón: en productos agropecuarios el desabasto es frecuente y genera fricción si no se maneja a tiempo.
+4. **El Research Agent siempre muestra su fuente.** Todo análisis de Claude API incluye los datos exactos que usó (precio, volumen, ATH, RSI, etc.) para que el usuario pueda verificar. El análisis además es consciente del portafolio actual del usuario.
 
-5. **El admin puede operar desde celular.** David gestiona su negocio en campo. Toda pantalla de admin debe ser usable en móvil con una mano. Razón: el usuario admin no está frente a un computador la mayor parte del día.
+5. **Toda orden requiere confirmación explícita.** Ningún botón ejecuta una operación en un solo clic. Siempre hay un modal de confirmación con los detalles completos.
 
 ---
 
 ## 🛠️ Stack Tecnológico
 
 | Capa | Tecnología | Razón |
-|---|---|---|
-| Frontend | React 18 + TypeScript | Base del proyecto BSM, tipado evita errores en lógica de precios |
-| Estilos | Tailwind CSS v3 | Consistencia visual con BSM, velocidad de desarrollo |
-| Backend / DB | Supabase (PostgreSQL) | Auth, RLS, storage para imágenes de productos |
-| Auth | Supabase Auth | Registro por email, diferenciación de rol en user metadata |
-| Imágenes | Supabase Storage | Fotos de productos subidas por David desde el admin |
-| Deploy | Vercel | Dominio propio de Agronausa, preview por branch |
-| Pagos | Wompi (fase 2) | Pasarela colombiana, integración sencilla |
+|------|-----------|-------|
+| Frontend | React 18 + TypeScript | SPA, tipado estricto |
+| Estilos | Tailwind CSS + shadcn/ui | Componentes financieros rápidos |
+| Backend/DB | Supabase (Postgres + Auth + Edge Functions) | Auth, storage seguro de keys, DB |
+| Broker NYSE | Alpaca Markets API | Paper + live trading NYSE/NASDAQ |
+| Broker Cripto | Binance API | Spot trading cripto |
+| Análisis IA | Claude API (claude-sonnet-4-20250514) | Research Agent + Screener IA |
+| Charts | Recharts + TradingView Widget (embed) | Equity chart + charts OHLCV por símbolo |
+| Estado | Zustand | Estado global liviano |
+| Fetching | TanStack Query (React Query) | Cache, refetch, loading states |
+| Build | Vite | Dev rápido |
+| Deploy | Vercel (preferido) o EasyPanel | CI/CD automático |
 
 ---
 
 ## 📁 Estructura del Proyecto
 
 ```
-agronausa/
+tradeos-personal/
 ├── src/
 │   ├── components/
-│   │   ├── ui/               # Botones, inputs, badges, modales reutilizables
-│   │   ├── catalog/          # ProductCard, ProductGrid, CategoryFilter
-│   │   ├── cart/             # CartDrawer, CartItem, CartSummary
-│   │   ├── orders/           # OrderCard, OrderStatus, OrderDetail
-│   │   ├── admin/            # ProductForm, InventoryTable, OrdersPanel
-│   │   └── layout/           # Header, Footer, MobileNav
+│   │   ├── ui/                    # shadcn/ui components
+│   │   ├── portfolio/
+│   │   │   ├── PortfolioSummary.tsx
+│   │   │   ├── PositionCard.tsx
+│   │   │   ├── EquityChart.tsx
+│   │   │   └── PnLWidget.tsx
+│   │   ├── trading/
+│   │   │   ├── OrderForm.tsx
+│   │   │   ├── OrderBook.tsx
+│   │   │   ├── OrderHistory.tsx
+│   │   │   └── ConfirmOrderModal.tsx
+│   │   ├── research/
+│   │   │   ├── ResearchPanel.tsx          # Input + historial
+│   │   │   ├── AnalysisCard.tsx           # Resultado con KPIs + TradingView widget
+│   │   │   ├── KpiGrid.tsx                # ATH dist, RSI, EPS guidance, etc.
+│   │   │   ├── TradingViewWidget.tsx      # Embed iframe del chart TradingView
+│   │   │   ├── PortfolioContext.tsx       # Muestra exposición actual al símbolo analizado
+│   │   │   └── WatchlistItem.tsx
+│   │   ├── screener/
+│   │   │   ├── ScreenerPanel.tsx          # Filtros configurables
+│   │   │   ├── ScreenerResultsTable.tsx   # Tabla interactiva con sort/filter
+│   │   │   ├── ScreenerCriteriaForm.tsx   # Formulario de criterios
+│   │   │   └── ScreenerSaveModal.tsx      # Guardar screener como preset
+│   │   └── layout/
+│   │       ├── Sidebar.tsx
+│   │       ├── Header.tsx
+│   │       └── AppShell.tsx
 │   ├── hooks/
-│   │   ├── useProducts.ts    # Fetch + filtros de catálogo
-│   │   ├── useCart.ts        # Estado del carrito (localStorage)
-│   │   ├── useOrders.ts      # Crear y consultar pedidos
-│   │   ├── useAuth.ts        # Login, registro, perfil, tipo de cliente
-│   │   └── useAdmin.ts       # CRUD de productos, gestión de pedidos
-│   ├── pages/
-│   │   ├── Home.tsx          # Hero + categorías destacadas
-│   │   ├── Catalog.tsx       # Catálogo completo con filtros
-│   │   ├── Product.tsx       # Detalle de producto
-│   │   ├── Cart.tsx          # Carrito y resumen
-│   │   ├── Checkout.tsx      # Datos de envío + confirmación
-│   │   ├── OrderConfirm.tsx  # Pantalla de pedido recibido
-│   │   ├── Account.tsx       # Historial de pedidos del cliente
-│   │   └── admin/
-│   │       ├── Dashboard.tsx
-│   │       ├── Products.tsx
-│   │       ├── Orders.tsx
-│   │       └── Customers.tsx
+│   │   ├── usePortfolio.ts
+│   │   ├── useOrders.ts
+│   │   ├── useMarketData.ts
+│   │   ├── useResearch.ts                 # Llamadas al Research Agent (con contexto de portafolio)
+│   │   ├── useScreener.ts                 # Ejecutar y guardar screeners
+│   │   └── useAuth.ts
+│   ├── stores/
+│   │   ├── portfolioStore.ts
+│   │   ├── tradingStore.ts
+│   │   ├── screenerStore.ts               # Criterios activos y resultados del screener
+│   │   └── uiStore.ts
 │   ├── lib/
-│   │   ├── supabase.ts       # Cliente Supabase
-│   │   ├── formatters.ts     # formatCOP, formatDate, formatWeight
-│   │   └── constants.ts      # Categorías, estados de pedido, roles
+│   │   ├── supabase.ts
+│   │   ├── formatters.ts
+│   │   └── constants.ts
+│   ├── pages/
+│   │   ├── Dashboard.tsx
+│   │   ├── Trading.tsx
+│   │   ├── Research.tsx
+│   │   ├── Screener.tsx                   # Nueva pantalla — Fase 5
+│   │   ├── History.tsx
+│   │   ├── Settings.tsx
+│   │   └── Login.tsx
 │   ├── types/
-│   │   └── index.ts          # Todos los tipos del dominio
+│   │   └── index.ts
 │   └── App.tsx
 ├── supabase/
-│   └── migrations/           # SQL migrations versionadas
-├── public/
-└── CLAUDE.md
+│   ├── functions/
+│   │   ├── alpaca-proxy/
+│   │   │   └── index.ts
+│   │   ├── binance-proxy/
+│   │   │   └── index.ts
+│   │   ├── claude-research/               # Research Agent potenciado
+│   │   │   └── index.ts
+│   │   └── claude-screener/               # Screener con Claude API + web search
+│   │       └── index.ts
+│   └── migrations/
+│       ├── 001_auth_setup.sql
+│       ├── 002_portfolio_tables.sql
+│       ├── 003_orders_tables.sql
+│       ├── 004_watchlist.sql
+│       └── 005_screener.sql
+├── .env.local
+├── .env.example
+├── CLAUDE.md
+└── package.json
 ```
 
 ---
@@ -96,117 +136,171 @@ agronausa/
 ## 💾 Schema de Base de Datos
 
 ```typescript
-// Extendido del user metadata de Supabase Auth
-interface UserProfile {
-  id: string                    // uuid — mismo que auth.users.id
-  full_name: string
-  phone: string
-  customer_type: 'persona' | 'negocio'
-  business_name?: string        // Solo si customer_type === 'negocio'
-  nit?: string                  // Solo si customer_type === 'negocio'
-  has_special_pricing: boolean  // true si David le asignó precios especiales
-  created_at: Date
-}
+// --- USUARIOS Y CONFIGURACIÓN ---
 
-interface Category {
-  id: string
-  name: string                  // 'Insumos', 'Semillas', 'Herramientas', etc.
-  slug: string
-  image_url?: string
-  sort_order: number
-  active: boolean
-}
-
-interface Product {
-  id: string
-  name: string
-  slug: string
-  description?: string
-  category_id: string           // FK → categories
-  price_retail: number          // Precio detal (COP)
-  price_wholesale?: number      // Precio mayoreo — visible solo a negocios
-  unit: string                  // 'kg', 'bulto', 'litro', 'unidad', 'caja'
-  min_wholesale_qty?: number    // Cantidad mínima para precio mayoreo
-  stock: number
-  images: string[]              // URLs en Supabase Storage
-  active: boolean
-  featured: boolean
+interface UserSettings {
+  id: string                        // uuid, FK → auth.users
+  alpaca_mode: 'paper' | 'live'    // SIEMPRE 'paper' en Fase 1
+  default_broker: 'alpaca' | 'binance'
+  risk_per_trade_pct: number        // % del portafolio por operación (default: 2)
   created_at: Date
   updated_at: Date
 }
 
-interface CartItem {
-  product_id: string
-  quantity: number
-  price_applied: number         // Precio en el momento de agregar al carrito
+// Las API keys se guardan como Supabase Secrets (vault), NUNCA en tablas
+
+// --- PORTAFOLIO ---
+
+interface Position {
+  id: string
+  user_id: string
+  broker: 'alpaca' | 'binance'
+  symbol: string
+  qty: number
+  avg_entry_price: number
+  current_price: number
+  market_value: number              // calculado: qty * current_price
+  unrealized_pnl: number            // calculado
+  unrealized_pnl_pct: number        // calculado
+  portfolio_weight_pct: number      // calculado: market_value / total_equity * 100
+  side: 'long' | 'short'
+  asset_class: 'equity' | 'crypto'
+  synced_at: Date
+  created_at: Date
 }
-// El carrito vive en localStorage, no en DB
+
+interface EquitySnapshot {
+  id: string
+  user_id: string
+  broker: 'alpaca' | 'binance' | 'total'
+  equity: number
+  cash: number
+  buying_power: number
+  snapshot_at: Date
+}
+
+// --- ÓRDENES ---
 
 interface Order {
   id: string
-  order_number: string          // Ej: AGN-2026-0042 (legible para David)
-  customer_id?: string          // null si compra como invitado
-  customer_snapshot: {          // Datos al momento del pedido (inmutables)
-    full_name: string
-    email: string
-    phone: string
-    business_name?: string
-  }
-  items: OrderItem[]
-  subtotal: number              // // calculado
-  total: number                 // // calculado
-  status: OrderStatus
-  shipping_address: Address
-  notes?: string                // Nota del cliente al pedir
-  admin_notes?: string          // Nota interna de David
-  created_at: Date
-  updated_at: Date
+  user_id: string
+  broker_order_id: string
+  broker: 'alpaca' | 'binance'
+  symbol: string
+  side: 'buy' | 'sell'
+  order_type: 'market' | 'limit' | 'stop' | 'stop_limit'
+  qty: number
+  limit_price?: number
+  stop_price?: number
+  filled_qty?: number
+  filled_avg_price?: number
+  status: 'pending' | 'accepted' | 'filled' | 'partially_filled' | 'cancelled' | 'rejected'
+  asset_class: 'equity' | 'crypto'
+  submitted_at: Date
+  filled_at?: Date
+  notes?: string
 }
 
-type OrderStatus =
-  | 'pendiente'      // Recién creado
-  | 'confirmado'     // David lo revisó
-  | 'en_preparacion' // En alistamiento
-  | 'despachado'     // Enviado / en camino
-  | 'entregado'      // Completado
-  | 'cancelado'
+// --- WATCHLIST ---
 
-interface OrderItem {
-  product_id: string
-  product_name: string          // Snapshot — no FK viva
-  quantity: number
-  unit: string
-  price_applied: number
-  subtotal: number              // // calculado
-}
-
-interface Address {
-  department: string
-  city: string
-  address_line: string
-  reference?: string
-}
-
-// Tabla para precios especiales B2B
-interface SpecialPricing {
+interface WatchlistItem {
   id: string
-  customer_id: string           // FK → profiles
-  product_id: string            // FK → products
-  price: number                 // Precio pactado con ese cliente
+  user_id: string
+  symbol: string
+  broker: 'alpaca' | 'binance'
+  asset_class: 'equity' | 'crypto'
+  alert_price_above?: number
+  alert_price_below?: number
+  notes?: string
+  added_at: Date
+}
+
+// --- RESEARCH ---
+
+interface ResearchEntry {
+  id: string
+  user_id: string
+  symbol: string
+  query: string
+  analysis: string
+  data_used: ResearchDataSnapshot    // snapshot completo de datos usados
+  portfolio_context: PortfolioContext // exposición al símbolo en el momento del análisis
+  model: string                      // 'claude-sonnet-4-20250514'
   created_at: Date
 }
 
-// Tabla para cumplimiento de Ley 1581 (Protección de Datos)
-interface ConsentRecord {
+interface ResearchDataSnapshot {
+  price: number
+  price_change_pct_1d: number
+  volume: number
+  volume_avg_30d: number
+  market_cap?: number
+  week_52_high: number               // para calcular distancia a ATH
+  week_52_low: number
+  ath_distance_pct: number           // calculado: (price - week_52_high) / week_52_high * 100
+  rsi_weekly?: number                // RSI semanal si disponible
+  eps_current?: number               // EPS último reportado
+  eps_next_estimate?: number         // EPS consenso próximo trimestre
+  revenue_growth_pct?: number        // crecimiento YoY
+  pe_ratio?: number
+  fetched_at: Date
+}
+
+interface PortfolioContext {
+  has_position: boolean
+  qty?: number
+  avg_entry_price?: number
+  unrealized_pnl_pct?: number
+  portfolio_weight_pct?: number      // % del portafolio total que representa esta posición
+}
+
+// --- SCREENER ---
+
+interface ScreenerPreset {
   id: string
-  order_id: string              // FK → orders
-  customer_name: string
-  email: string
-  phone: string
-  ip_address: string
-  user_agent: string
-  accepted_at: Date
-  version: string               // Versión de los TyC aceptados
+  user_id: string
+  name: string                       // ej: "Momentum Growth", "Breakout cerca de ATH"
+  criteria: ScreenerCriteria
+  last_run_at?: Date
+  created_at: Date
+}
+
+interface ScreenerCriteria {
+  market_cap_min?: number            // en USD (ej: 2_000_000_000)
+  price_min?: number                 // precio mínimo por acción
+  revenue_growth_min_pct?: number    // crecimiento de ingresos YoY mínimo
+  volume_avg_min?: number            // volumen diario promedio mínimo
+  eps_next_positive: boolean         // EPS proyectado próximo año debe ser positivo
+  ath_distance_max_pct?: number      // máx % de distancia al máximo de 52 semanas (ej: 20)
+  rsi_weekly_min?: number            // RSI semanal mínimo
+  rsi_weekly_max?: number            // RSI semanal máximo
+  exclude_dividends?: boolean        // excluir empresas que pagan dividendos
+  asset_class: 'equity' | 'crypto' | 'both'
+}
+
+interface ScreenerResult {
+  id: string
+  user_id: string
+  preset_id?: string                 // FK → screener_presets (si se corrió desde un preset)
+  criteria: ScreenerCriteria
+  results: ScreenerResultItem[]
+  total_found: number
+  ai_summary?: string                // resumen Claude de los resultados más destacados
+  run_at: Date
+}
+
+interface ScreenerResultItem {
+  symbol: string
+  name: string
+  price: number
+  market_cap: number
+  revenue_growth_pct: number
+  ath_distance_pct: number           // negativo = está debajo del ATH
+  rsi_weekly?: number
+  eps_next_estimate?: number
+  volume_avg: number
+  score: number                      // 0-100 calculado por Claude según fit con criterios
+  ai_note?: string                   // nota breve de Claude sobre por qué destaca
 }
 ```
 
@@ -214,103 +308,132 @@ interface ConsentRecord {
 
 ## 🔄 Flujos de Negocio Críticos
 
-### Flujo 1: Cliente explora y hace un pedido (sin cuenta)
-1. Entra a agronausa.com — ve catálogo sin login
-2. Filtra por categoría o busca producto
-3. Agrega al carrito (persiste en localStorage)
-4. Va a checkout → ingresa nombre, email, teléfono, dirección
-5. Confirma pedido → se crea `order` con `customer_id: null`
-6. Recibe pantalla de confirmación con número de pedido
-7. David recibe notificación (email o WhatsApp — fase 2)
+### Flujo 1: Ver estado del portafolio (< 2s)
+1. Usuario abre Dashboard
+2. `usePortfolio` lee `positions` y último `equity_snapshot` desde Supabase (cache React Query, stale 30s)
+3. Si los datos tienen > 60s, se dispara sync en background via Edge Function `alpaca-proxy`
+4. Dashboard renderiza con datos del cache; badge "actualizando" si hay sync en curso
+5. Al completar sync, React Query invalida y re-renderiza
 
-### Flujo 2: Cliente B2B ve sus precios especiales
-1. Entra y hace login con su cuenta
-2. Si `customer_type === 'negocio'` y `has_special_pricing === true`:
-   - Los `ProductCard` muestran el precio de `special_pricing` en vez de `price_retail`
-3. El carrito usa `price_applied` desde `special_pricing`
-4. El pedido registra el precio real cobrado (snapshot inmutable)
+### Flujo 2: Ejecutar una orden (paper trading)
+1. Usuario selecciona símbolo en watchlist o posición
+2. Abre `OrderForm` → ingresa side, type, qty, precio (si aplica)
+3. Sistema calcula impacto: % del portafolio, valor aproximado
+4. Usuario hace click "Revisar orden" → `ConfirmOrderModal` muestra resumen completo
+5. Usuario confirma → llamada a Edge Function `alpaca-proxy` POST `/orders`
+6. Alpaca responde → orden se guarda en tabla `orders` con status `accepted`
+7. Polling actualiza status a `filled`
+8. Posición actualizada en tabla `positions`
 
-### Flujo 3: David gestiona un pedido (admin móvil)
-1. Entra al panel admin → ve listado de pedidos ordenados por fecha
-2. Toca un pedido → ve detalle completo
-3. Cambia el estado (pendiente → confirmado → despachado → entregado)
-4. Puede agregar nota interna (`admin_notes`)
-5. El historial del cliente se actualiza en tiempo real
+### Flujo 3: Research Agent (con contexto de portafolio)
+1. Usuario ingresa símbolo o pregunta en `ResearchPanel`
+2. Hook `useResearch` llama a Edge Function `claude-research`
+3. Edge Function ejecuta en paralelo:
+   - (a) Datos de mercado del símbolo: precio, volumen, high/low 52w, ATH distance, RSI semanal
+   - (b) Datos fundamentales: EPS actual, EPS guidance próximo trimestre, revenue growth, P/E
+   - (c) Contexto de portafolio: posición actual del usuario en ese símbolo (qty, entry price, weight %)
+4. Construye prompt con TODOS esos datos explícitos + pregunta del usuario
+5. Claude API genera análisis en streaming que incluye:
+   - Cuadro de mando ejecutivo (ticker, precio, distancia a ATH, market cap)
+   - Tesis de inversión y catalizadores
+   - Análisis de KPIs fundamentales con guidance
+   - **Sección "Tu exposición"**: si el usuario tiene posición, evalúa si mantener/recortar/ampliar
+   - Riesgos clave
+   - Niveles técnicos (soporte, resistencia, RSI)
+6. UI muestra: análisis streaming + panel lateral con datos fuente + TradingView widget del símbolo
+7. Análisis guardado en `research_entries` con `data_used` y `portfolio_context`
 
-### Flujo 4: David actualiza stock / agrega producto
-1. Admin → Productos → "Nuevo producto" o toca un producto existente
-2. Sube fotos desde el celular (Supabase Storage)
-3. Ingresa precio detal, y opcionalmente precio mayoreo + cantidad mínima
-4. Guarda → visible inmediatamente en el catálogo público
+### Flujo 4: Screener (buscar oportunidades)
+1. Usuario va a `/screener` y configura criterios en `ScreenerCriteriaForm`
+2. Puede cargar un preset guardado o crear criterios nuevos
+3. Hook `useScreener` llama a Edge Function `claude-screener`
+4. Edge Function:
+   - (a) Obtiene universo de símbolos filtrado por criterios objetivos (market cap, volumen, precio) vía Alpaca data API
+   - (b) Para los candidatos, obtiene datos fundamentales y técnicos
+   - (c) Claude API filtra, puntúa (score 0-100) y genera nota breve por símbolo
+   - (d) Claude genera resumen ejecutivo de los mejores resultados en el contexto del portafolio actual
+5. `ScreenerResultsTable` muestra tabla interactiva: sortable por score, distancia ATH, growth
+6. Usuario puede hacer click en cualquier resultado → abre Research Agent con ese símbolo precargado
+7. Resultado guardado en `screener_results`; preset guardable para correr de nuevo
 
-### Flujo 5: Producto sin stock en checkout
-1. Cliente tiene producto en carrito
-2. Al llegar a checkout, el sistema verifica stock en tiempo real
-3. Si stock < cantidad solicitada → muestra alerta antes del pago
-4. Cliente puede ajustar cantidad o eliminar el ítem
-5. Nunca se genera un pedido con stock negativo
+### Flujo 5: Configurar API keys (onboarding)
+1. Usuario va a Settings
+2. Ingresa keys de Alpaca (paper) y/o Binance
+3. Frontend llama a Edge Function `save-api-keys` que guarda en Supabase Vault
+4. Edge Function hace test de conexión; retorna `{valid: true/false}`
+5. UI confirma configuración activa
 
 ---
 
 ## 🎨 Sistema de Diseño
 
 ```css
+/* Tema dark trading — profesional, alta densidad de información */
 :root {
-  /* Paleta Agronausa — tierra, vegetación, confianza */
-  --color-primary:     #2D6A1F;  /* Verde campo — CTA principal */
-  --color-primary-hover: #245517;
-  --color-accent:      #C4853A;  /* Tierra / cosecha — badges, highlights */
-  --color-bg:          #F9F6F0;  /* Fondo crema cálido */
-  --color-surface:     #FFFFFF;
-  --color-border:      #DDD5C8;
-  --color-text:        #2C1A0E;  /* Café oscuro */
-  --color-text-muted:  #7A6553;
-  --color-success:     #3A7D44;
-  --color-error:       #C0392B;
-  --color-warning:     #E67E22;
+  /* Backgrounds */
+  --bg-base:      #0a0e17;
+  --bg-surface:   #111827;
+  --bg-elevated:  #1f2937;
+  --bg-hover:     #374151;
 
-  /* Tipografía */
-  --font-display:  'Plus Jakarta Sans', sans-serif;  /* Títulos */
-  --font-body:     'Inter', sans-serif;              /* Cuerpo */
-  --font-mono:     'JetBrains Mono', monospace;      /* Precios, cantidades */
+  /* Texto */
+  --text-primary:   #f9fafb;
+  --text-secondary: #9ca3af;
+  --text-muted:     #6b7280;
 
-  /* Touch — el admin opera desde celular */
-  --touch-min:     48px;   /* Altura mínima de cualquier elemento interactivo */
-  --touch-min-sm:  44px;   /* En componentes compactos */
+  /* Semánticos financieros */
+  --color-profit:  #10b981;
+  --color-loss:    #ef4444;
+  --color-neutral: #6b7280;
+  --color-warning: #f59e0b;
+
+  /* Accent */
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+
+  /* Bordes */
+  --border-subtle: #1f2937;
+  --border-default: #374151;
 }
 ```
 
-**Reglas de touch obligatorias:**
-- Todo botón de acción: mínimo 48px de alto
-- Botones de cantidad (+/-): 48×48px cuadrado
-- Separación entre elementos táctiles: mínimo 8px
-- Fuente mínima en móvil: 14px
+**Tipografía:**
+- Display/títulos: `Inter` (weight 600-700)
+- Cuerpo/UI: `Inter` (weight 400-500)
+- Números/precios: `JetBrains Mono` — siempre monospace
+
+**Reglas de densidad:**
+- Números de precio/PnL siempre en monospace
+- Positivo = `text-emerald-400`, negativo = `text-red-400`
+- Porcentajes con signo explícito: `+2.3%` / `-1.1%`
+- Score del screener: badge de color por rango (≥80 verde, 60-79 amarillo, <60 gris)
 
 ---
 
 ## 📦 Seed Data
 
-Al inicializar el proyecto cargar automáticamente si la DB está vacía:
+Al completar onboarding, precargar:
 
-**Categorías (8):**
-Insumos agrícolas, Semillas y material vegetal, Herramientas, Fertilizantes, Plaguicidas, Equipos de riego, Alimentos para animales, Otros
+**Watchlist default:**
+```
+Equities (Alpaca):  AAPL, MSFT, NVDA, TSLA, SPY
+Cripto (Binance):   BTC/USDT, ETH/USDT, SOL/USDT
+```
 
-**Productos de muestra (10):**
-Mínimo 2 productos por categoría principal, con foto placeholder, precio real estimado en COP, stock inicial de 50.
+**Screener presets default (2):**
+```
+1. "Momentum Growth"
+   - Market cap > $2B
+   - Revenue growth > 20%
+   - Volumen diario > 200K
+   - Distancia ATH < 20%
+   - EPS próximo positivo
 
-**Usuario admin (1):**
-Email configurado en `.env` como `ADMIN_EMAIL`. Role asignado via Supabase metadata `{ role: 'admin' }`.
-
-**Hook de seed:**
-```typescript
-// src/lib/seed.ts
-export async function runSeedIfEmpty() {
-  const { count } = await supabase
-    .from('categories')
-    .select('*', { count: 'exact', head: true })
-  if (count === 0) await seedDatabase()
-}
-// Llamar en App.tsx solo una vez
+2. "Breakout Técnico"
+   - Market cap > $1B
+   - Precio > $10
+   - Distancia ATH < 10%
+   - RSI semanal 50-70
 ```
 
 ---
@@ -318,85 +441,107 @@ export async function runSeedIfEmpty() {
 ## 🖥️ Pantallas y Navegación
 
 ```
-HOME
-┌─────────────────────────────────┐
-│ [Logo Agronausa]    🛒 Carrito  │
-├─────────────────────────────────┤
-│   Hero: foto campo + tagline    │
-│   [Ver catálogo completo]       │
-├─────────────────────────────────┤
-│ Categorías destacadas (scroll)  │
-│ [🌱 Semillas] [🔧 Herramientas] │
-├─────────────────────────────────┤
-│ Productos destacados (grid 2x)  │
-│ ┌──────┐ ┌──────┐              │
-│ │ img  │ │ img  │              │
-│ │$xxx  │ │$xxx  │              │
-│ └──────┘ └──────┘              │
-└─────────────────────────────────┘
+SIDEBAR (izquierda, colapsable)
+├── 📊 Dashboard        → /
+├── 📈 Trading          → /trading
+├── 🔍 Research         → /research
+├── 🎯 Screener         → /screener         ← NUEVA
+├── 📋 Historial        → /history
+└── ⚙️  Settings        → /settings
 
-CATÁLOGO
-┌─────────────────────────────────┐
-│ Filtro categoría [dropdown]     │
-│ Buscar... [🔍]                  │
-├─────────────────────────────────┤
-│ Grid de productos (2 cols)      │
-│ ┌──────┐ ┌──────┐              │
-│ │ img  │ │ img  │              │
-│ │Nombre│ │Nombre│              │
-│ │$xx kg│ │$xx kg│              │
-│ [+carr]  [+carr]               │
-└─────────────────────────────────┘
+DASHBOARD (/)
+┌─────────────────────────────────────────────┐
+│  Total Equity: $XX,XXX.XX   PnL Hoy: +X.X% │
+│  [Alpaca: $XX,XXX] [Binance: $XX,XXX]       │
+├────────────────────┬────────────────────────┤
+│  POSICIONES        │  EQUITY CHART (30d)    │
+│  AAPL  +2.3%  $XXX │  [línea temporal]      │
+│  BTC   -1.1%  $XXX │                        │
+└────────────────────┴────────────────────────┘
 
-CHECKOUT
-┌─────────────────────────────────┐
-│ Resumen pedido (colapsable)     │
-├─────────────────────────────────┤
-│ Nombre completo                 │
-│ Teléfono                        │
-│ Email                           │
-│ Departamento / Ciudad           │
-│ Dirección                       │
-│ Notas (opcional)                │
-├─────────────────────────────────┤
-│ Total: $xxx.xxx COP             │
-│ [Confirmar pedido]              │
-└─────────────────────────────────┘
+TRADING (/trading)
+┌──────────────┬────────────────────────────────┐
+│  ORDER FORM  │  WATCHLIST + PRECIOS EN TIEMPO │
+│  Symbol: ___ │  AAPL   $XXX.XX  +X.X%         │
+│  Side: B/S   │  BTC    $XX,XXX  -X.X%         │
+│  [REVISAR]   │                                │
+└──────────────┴────────────────────────────────┘
 
-ADMIN — PEDIDOS (móvil)
-┌─────────────────────────────────┐
-│ [pendiente][confirmado][todos]  │
-├─────────────────────────────────┤
-│ AGN-2026-0042                   │
-│ Carlos Martínez · hace 2h       │
-│ $145.000 · 3 productos    [›]  │
-├─────────────────────────────────┤
-│ AGN-2026-0041                   │
-│ Distribuciones El Campo · 1d    │
-│ $890.000 · 8 productos    [›]  │
-└─────────────────────────────────┘
+RESEARCH (/research)
+┌─────────────────────────────────────────────────────────┐
+│  [Analizar símbolo o hacer pregunta...]   [ANALIZAR]    │
+├──────────────────────────────┬──────────────────────────┤
+│  ANÁLISIS (streaming)        │  DATOS FUENTE            │
+│                              │  Precio:    $XXX.XX      │
+│  📊 CUADRO DE MANDO          │  ATH dist:  -8.3%        │
+│  AAPL  $XXX  ATH: -8.3%     │  RSI sem:   62           │
+│  Market cap: $X.XT           │  EPS act:   $X.XX        │
+│                              │  EPS est:   $X.XX (+X%)  │
+│  📈 TESIS DE INVERSIÓN       │  Rev grow:  +XX%         │
+│  [análisis Claude...]        │  Vol:       XXM          │
+│                              ├──────────────────────────┤
+│  💼 TU EXPOSICIÓN            │  TU POSICIÓN             │
+│  Tenés X% del portafolio     │  Qty: XX @ $XXX          │
+│  PnL actual: +X.X%           │  PnL: +$XXX (+X.X%)      │
+│  Recomendación: [...]        │  Weight: X% del total    │
+│                              ├──────────────────────────┤
+│  ⚠️ RIESGOS                  │  [TradingView Chart]     │
+│  [análisis Claude...]        │  [AAPL — 1D — vela]     │
+│                              │                          │
+│  📐 NIVELES TÉCNICOS         │                          │
+│  Soporte: $XXX               │                          │
+│  Resistencia: $XXX           │                          │
+└──────────────────────────────┴──────────────────────────┘
+│  [Historial de análisis anteriores]                     │
+└─────────────────────────────────────────────────────────┘
+
+SCREENER (/screener)
+┌─────────────────────────────────────────────────────────┐
+│  🎯 SCREENER    [Presets ▼]   [Guardar preset]  [▶ Run] │
+├─────────────────────────────────────────────────────────┤
+│  CRITERIOS                                              │
+│  Market Cap mín: [$2B    ]  Revenue growth mín: [20%]  │
+│  Precio mín:     [$9     ]  Dist. ATH máx:      [20%]  │
+│  Volumen diario: [200K   ]  RSI semanal:         [--  ] │
+│  ☑ EPS próximo positivo    ☐ Sin dividendos            │
+├─────────────────────────────────────────────────────────┤
+│  RESULTADOS — 12 encontrados   IA: "Los más destacados  │
+│                                 son NVDA y META por..." │
+│  SYMBOL  PRECIO  GROW%  ATH%   RSI  EPS EST  SCORE     │
+│  NVDA    $XXX   +45%   -5.2%  65   $X.XX     94 🟢     │
+│  META    $XXX   +22%   -8.1%  58   $X.XX     87 🟢     │
+│  CRWD    $XXX   +31%   -12%   61   $X.XX     79 🟡     │
+│  ...                                                    │
+│  [Click en cualquier fila → abre Research de ese símbolo]│
+└─────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## ⚙️ Configuración Técnica
 
-```env
-# .env.local
+**.env.example:**
+```
+# Supabase
 VITE_SUPABASE_URL=
 VITE_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=     # Solo en funciones de servidor
-ADMIN_EMAIL=david@agronausa.com
-VITE_SITE_NAME=Agronausa
-VITE_WHATSAPP_NUMBER=573204953114  # Para botón "Consultar por WhatsApp"
+
+# Solo en Edge Functions (Supabase secrets, no en .env del frontend)
+# ALPACA_API_KEY=
+# ALPACA_SECRET_KEY=
+# ALPACA_BASE_URL=https://paper-api.alpaca.markets
+# BINANCE_API_KEY=
+# BINANCE_SECRET_KEY=
+# ANTHROPIC_API_KEY=
 ```
 
-```typescript
-// tsconfig.json — strict mode obligatorio
+**tsconfig.json — strict mode obligatorio:**
+```json
 {
   "compilerOptions": {
     "strict": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true
   }
 }
 ```
@@ -405,93 +550,137 @@ VITE_WHATSAPP_NUMBER=573204953114  # Para botón "Consultar por WhatsApp"
 
 ## 🚀 Orden de Construcción para Claude Code
 
-### Fase 1: Setup y base (Día 1)
-- [x] Crear proyecto Vite + React + TypeScript + Tailwind
-- [x] Configurar Supabase: tablas, RLS básico, Storage bucket para imágenes
-- [x] Variables de entorno y cliente Supabase
-- [x] Sistema de diseño: variables CSS, fuentes, componentes UI base (Button, Badge, Input)
-- [x] Routing básico (React Router): Home, Catalog, Product, Cart, Checkout, Admin
-- [x] **Criterio de éxito:** La app carga, el router funciona, Supabase conecta sin errores
+### Fase 1: Setup + Auth + Dashboard Básico
 
-### Fase 2: Catálogo público (Día 2)
-- [x] `useProducts` hook con fetch, filtro por categoría y búsqueda
-- [x] `ProductCard` con imagen, nombre, precio, unidad, botón agregar al carrito
-- [x] `ProductGrid` con filtro de categorías
-- [x] Página `Catalog.tsx` completa
-- [x] Página `Product.tsx` con detalle y galería de imágenes
-- [x] **Criterio de éxito:** Se pueden ver todos los productos, filtrar y buscar sin login
+- [ ] `npm create vite@latest tradeos-personal -- --template react-ts`
+- [ ] Instalar dependencias: `tailwindcss shadcn/ui zustand @tanstack/react-query @supabase/supabase-js recharts`
+- [ ] Configurar Tailwind con tema dark (variables CSS del sistema de diseño)
+- [ ] Inicializar shadcn/ui con tema custom
+- [ ] Crear proyecto en Supabase, configurar Auth (email/password)
+- [ ] Migration `001`: tabla `user_settings`
+- [ ] Migration `002`: tablas `positions` y `equity_snapshots`
+- [ ] Implementar `Login.tsx` con Supabase Auth
+- [ ] Implementar `AppShell.tsx` con Sidebar colapsable
+- [ ] Crear Edge Function `alpaca-proxy` con endpoints: GET `/account`, GET `/positions`
+- [ ] Guardar Alpaca paper keys como Supabase Secrets
+- [ ] Hook `usePortfolio` → llama a `alpaca-proxy`, cachea en React Query (stale 30s)
+- [ ] `Dashboard.tsx`: muestra equity total, lista de posiciones con PnL color-coded
+- [ ] `EquityChart.tsx`: línea de equity histórico con Recharts
+- [ ] **Criterio de éxito Fase 1**: Login funciona → se ven posiciones reales de Alpaca paper → dashboard carga en < 2s
 
-### Fase 3: Carrito y pedido (Día 3)
-- [x] `useCart` hook con localStorage (agregar, quitar, cambiar cantidad)
-- [x] `CartDrawer` lateral (slide-over en móvil)
-- [x] Validación de stock en checkout (consulta en tiempo real)
-- [x] Formulario de checkout con validación
-- [x] Creación de orden en Supabase + pantalla de confirmación con número AGN-XXXX
-- [x] **Criterio de éxito:** Un visitante sin cuenta puede hacer un pedido completo de punta a punta
+### Fase 2: Trading Engine (paper)
 
-### Fase 4: Auth y precios B2B (Día 4)
-- [x] Registro y login (email + password, Supabase Auth)
-- [x] Formulario de registro con campo `customer_type` (persona / negocio)
-- [x] `useAuth` hook con perfil y tipo de cliente
-- [x] Lógica de precios: si el usuario es negocio con `special_pricing`, mostrar precio especial
-- [x] Página `Account.tsx`: historial de pedidos del cliente
-- [x] **Criterio de éxito:** Un usuario B2B ve su precio especial en el catálogo, un B2C ve el precio base
+- [ ] Migration `003`: tabla `orders`
+- [ ] `OrderForm.tsx` con validación de campos
+- [ ] `ConfirmOrderModal.tsx` con resumen de impacto
+- [ ] Edge Function `alpaca-proxy` POST `/orders`
+- [ ] Hook `useOrders` para historial y polling de status
+- [ ] `Trading.tsx` completo con watchlist de precios en tiempo real
+- [ ] **Criterio de éxito Fase 2**: Se puede enviar y ver una orden paper en Alpaca desde la UI
 
-### Fase 5: Panel Admin (Día 5-6)
-- [x] Guard de ruta admin (solo si `role === 'admin'`)
-- [x] Dashboard con métricas básicas: pedidos hoy, ingresos del mes, productos con bajo stock
-- [x] `Orders.tsx`: listado con filtros por estado, detalle de pedido, cambio de estado
-- [x] `Products.tsx`: listado, formulario crear/editar, subida de imágenes a Supabase Storage
-- [x] `Customers.tsx`: listado de clientes registrados, asignar `has_special_pricing`
-- [x] Formulario de `SpecialPricing`: asignar precio especial por producto a un cliente B2B
-- [x] **Criterio de éxito:** David puede gestionar pedidos, subir productos y asignar precios desde su celular
+### Fase 3: Research Agent Potenciado
 
-### Fase 6: Pulido y deploy (Día 7)
-- [x] SEO básico: meta tags, Open Graph, favicon con logo Agronausa
-- [x] Botón flotante "Consultar por WhatsApp" (usa `VITE_WHATSAPP_NUMBER`)
-- [x] Estados vacíos, loading skeletons, manejo de errores en UI
-- [x] Responsive final pass: revisar todo en 375px
-- [x] Deploy en Vercel con dominio agronausa.com
-- [x] **Criterio de éxito:** El sitio está publicado, David puede acceder al admin, el primer pedido de prueba funciona
+- [ ] Edge Function `claude-research`:
+  - Fetch en paralelo: precio, volumen, 52w high/low, ATH distance, RSI semanal (Alpaca data API)
+  - Fetch fundamentales: EPS actual + guidance, revenue growth, P/E (Alpaca o fuente alternativa)
+  - Incluir contexto de portafolio: posición actual del usuario en ese símbolo
+  - Prompt estructurado que genere las 5 secciones del análisis (cuadro mando, tesis, exposición personal, riesgos, niveles técnicos)
+  - Respuesta en streaming
+- [ ] `KpiGrid.tsx`: panel de datos fuente (precio, ATH dist, RSI, EPS actual vs estimado, revenue growth)
+- [ ] `TradingViewWidget.tsx`: embed del chart de TradingView via iframe para el símbolo analizado
+- [ ] `PortfolioContext.tsx`: sección "Tu exposición" con datos de la posición actual si existe
+- [ ] `ResearchPanel.tsx` con streaming response y layout de dos columnas (análisis | datos + chart)
+- [ ] Migration `004`: tabla `research_entries` (con campos `data_used` y `portfolio_context`)
+- [ ] Guardar historial de análisis por símbolo
+- [ ] **Criterio de éxito Fase 3**: Análisis de AAPL muestra datos reales de ATH, RSI, EPS guidance + sección de exposición del portafolio + chart TradingView
+
+### Fase 4: Binance + Cripto
+
+- [ ] Edge Function `binance-proxy` con endpoints spot
+- [ ] Normalizar `positions` para mostrar crypto y equity juntos
+- [ ] Unified equity total (Alpaca + Binance)
+- [ ] **Criterio de éxito Fase 4**: Dashboard muestra posiciones de ambos brokers unificadas
+
+### Fase 5: Screener + Alertas + Deploy
+
+- [ ] Migration `005`: tablas `screener_presets` y `screener_results`
+- [ ] Edge Function `claude-screener`:
+  - Recibe `ScreenerCriteria` del cliente
+  - Filtra universo vía Alpaca data API (market cap, precio, volumen)
+  - Para candidatos: obtiene datos fundamentales y técnicos
+  - Claude API: puntúa cada candidato (score 0-100) con nota breve, genera resumen ejecutivo
+  - Retorna `ScreenerResult` con contexto del portafolio actual
+- [ ] `ScreenerCriteriaForm.tsx`: formulario de criterios con rangos numéricos y toggles
+- [ ] `ScreenerResultsTable.tsx`: tabla interactiva con sort por cualquier columna, badge de score
+- [ ] `ScreenerPanel.tsx`: gestión de presets (cargar, guardar, nombrar)
+- [ ] Precargar 2 screener presets default al onboarding
+- [ ] Click en resultado → navega a Research con símbolo precargado
+- [ ] Tabla `watchlist` con alertas de precio
+- [ ] `Settings.tsx` completo con gestión de keys y preferencias
+- [ ] Deploy en Vercel con variables de entorno configuradas
+- [ ] **Criterio de éxito Fase 5**: Screener corre con criterios reales, devuelve resultados puntuados, se puede navegar a Research desde un resultado
 
 ---
 
 ## 🚨 Reglas de Código
 
-**SIEMPRE:**
-- TypeScript strict, nunca `any`
-- Todo acceso a Supabase a través de hooks (`useProducts`, `useOrders`, etc.) — nunca llamadas directas desde componentes
-- Formatear precios con `formatCOP(price)` — nunca template literals crudos
-- Validar stock antes de crear un pedido
-- RLS activado en todas las tablas desde el día 1
-- Los snapshots de pedido (nombre, precio) son inmutables después de creado — nunca join vivo con productos
+### SIEMPRE:
+- TypeScript strict — `noImplicitAny` en todo
+- Acceder a Supabase solo desde hooks en `src/hooks/`; nunca directo en componentes
+- Todos los números financieros formateados con `formatCurrency()` o `formatPercent()` de `lib/formatters.ts`
+- Números y precios en fuente monospace (clase `font-mono`)
+- Positivo/negativo con clases `text-emerald-400` / `text-red-400` consistentemente
+- Toda llamada a Edge Function con manejo de error explícito (try/catch + toast)
+- Edge Functions con validación de JWT de Supabase al inicio
+- El prompt de `claude-research` debe incluir TODOS los datos del `ResearchDataSnapshot` y el `PortfolioContext` antes de la pregunta del usuario
+- El prompt de `claude-screener` debe recibir el portafolio actual del usuario para que Claude pueda identificar oportunidades que complementen (no dupliquen) las posiciones existentes
 
-**NUNCA:**
-- No hardcodear precios ni categorías — todo viene de la DB
-- No mostrar el precio B2B a un usuario no autenticado o B2C
-- No permitir stock negativo
-- No exponer `SUPABASE_SERVICE_ROLE_KEY` en el frontend
-- No usar `useEffect` para lógica de negocio — usar hooks dedicados
+### NUNCA:
+- API keys de Alpaca, Binance o Anthropic en el frontend o en tablas de Supabase
+- Ejecutar órdenes sin pasar por `ConfirmOrderModal`
+- Llamadas directas a brokers externos desde el cliente (siempre via Edge Functions)
+- `any` en TypeScript sin comentario explicativo
+- Estado local para datos que vienen de la DB (usar React Query)
+- Hardcodear el modo 'live' en Fase 1-2
+- Mostrar análisis de Research sin el panel de datos fuente visible simultáneamente
+- Mostrar resultados del Screener sin el score y la nota de Claude por ítem
 
 ---
 
 ## 📋 Comandos de Desarrollo
 
 ```bash
-npm run dev          # Servidor local
-npm run build        # Build de producción
-npm run preview      # Preview del build
-npx supabase start   # DB local (opcional)
-npx supabase db push # Aplicar migrations a producción
+# Setup inicial
+npm create vite@latest tradeos-personal -- --template react-ts
+cd tradeos-personal
+npm install
+
+# Dev
+npm run dev
+
+# Supabase local
+supabase start
+supabase functions serve alpaca-proxy --env-file .env.local
+supabase functions serve claude-research --env-file .env.local
+supabase functions serve claude-screener --env-file .env.local
+
+# Migrations
+supabase db push
+
+# Deploy
+vercel --prod
 ```
 
 ---
 
 ## 🔮 Roadmap Futuro (no construir ahora)
 
-- **Pagos online con Wompi** — integrar en checkout como segunda opción de pago
-- **Notificaciones WhatsApp** — avisar a David cuando llega un pedido vía API de WhatsApp Business
-- **Pedidos recurrentes** — el cliente B2B puede repetir un pedido anterior con un clic
-- **Catálogo con variantes** — mismo producto en distintas presentaciones (1kg, 5kg, bulto)
-- **App móvil nativa** — si el volumen de pedidos lo justifica, migrar admin a React Native
-- **Analítica de ventas** — reportes de productos más vendidos, clientes frecuentes, estacionalidad
+- **Live trading**: activar modo live en Alpaca (requiere cuenta real + validación extra)
+- **Screener scheduling**: correr screeners automáticamente antes de apertura del mercado (cron)
+- **Alertas push**: notificación cuando un screener preset encuentra nuevas oportunidades
+- **Mobile PWA**: versión optimizada para móvil
+- **Backtesting**: probar estrategias con datos históricos
+- **Multi-usuario**: convertir a SaaS si hay demanda
+- **TradingView charts avanzados**: reemplazar embed por Lightweight Charts con datos propios
+- **Portfolio analytics**: Sharpe ratio, drawdown máximo, correlación entre activos
+- **Estrategias automatizadas**: reglas if/then para órdenes programáticas

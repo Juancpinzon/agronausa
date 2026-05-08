@@ -13,18 +13,21 @@ create table if not exists profiles (
 
 alter table profiles enable row level security;
 
+drop policy if exists "Users view own profile" on profiles;
 create policy "Users view own profile" on profiles
   for select using (auth.uid() = id);
 
+drop policy if exists "Users update own profile" on profiles;
 create policy "Users update own profile" on profiles
   for update using (auth.uid() = id);
 
+drop policy if exists "Admins manage profiles" on profiles;
 create policy "Admins manage profiles" on profiles
   for all using (
     (auth.jwt() -> 'user_metadata' ->> 'role') = 'admin'
   );
 
--- Auto-create profile row on sign-up (copies metadata from the signup call)
+-- Auto-create profile row on sign-up
 create or replace function handle_new_user()
 returns trigger
 language plpgsql
@@ -44,6 +47,7 @@ begin
 end;
 $$;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure handle_new_user();
@@ -60,15 +64,12 @@ create table if not exists special_pricing (
 
 alter table special_pricing enable row level security;
 
--- Users can only see their own special pricing
+drop policy if exists "Users view own special pricing" on special_pricing;
 create policy "Users view own special pricing" on special_pricing
   for select using (auth.uid() = customer_id);
 
+drop policy if exists "Admins manage special pricing" on special_pricing;
 create policy "Admins manage special pricing" on special_pricing
   for all using (
     (auth.jwt() -> 'user_metadata' ->> 'role') = 'admin'
   );
-
--- Allow authenticated users to link orders to their account
--- (the existing "Customers see own orders" policy already covers SELECT)
--- Add UPDATE policy so order can be linked at checkout time if needed

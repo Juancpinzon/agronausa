@@ -1,4 +1,4 @@
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 import { useCart } from "../../hooks/useCart";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -45,6 +45,7 @@ function LeafMark() {
 
 export default function Header() {
   const { itemCount, openCart } = useCart();
+  const navigate = useNavigate();
   const { user, profile, logout } = useAuth();
 
   const isAdmin =
@@ -116,10 +117,10 @@ export default function Header() {
                 {profile?.full_name?.split(" ")[0] ?? "Mi cuenta"}
               </Link>
               <button
-                onClick={() => void logout()}
-                className="rounded-full px-3.5 py-2 text-sm font-medium font-ui text-text-muted transition-colors hover:bg-primary/8 hover:text-text"
+                onClick={() => void logout().then(() => navigate("/ingresar"))}
+                className="rounded-full px-3.5 py-2 text-sm font-medium font-ui text-text-muted transition-colors hover:bg-red-500/10 hover:text-red-500"
               >
-                Salir
+                Cerrar sesión
               </button>
             </div>
           ) : (
