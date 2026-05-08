@@ -14,8 +14,7 @@ export default function AdminUserRow({ user, onToggleAdmin, isAdminEmail }: Admi
 
   const isAdmin = user.role === "admin";
   
-  // Usamos un fallback seguro ya que el email puede venir embebido dependiendo de si la db lo incluye
-  const primaryText = (user as any).email || user.full_name;
+  const primaryText = user.email || user.full_name;
   const secondaryText = user.customer_type === "negocio" 
     ? `${user.business_name || user.full_name} · B2B`
     : `${user.full_name}`;

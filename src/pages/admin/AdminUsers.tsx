@@ -35,7 +35,7 @@ export default function AdminUsers() {
             key={user.id} 
             user={user} 
             onToggleAdmin={setAdminRole}
-            isAdminEmail={rootAdminEmail ? ((user as any).email === rootAdminEmail || user.full_name === rootAdminEmail) : false}
+            isAdminEmail={rootAdminEmail ? user.email === rootAdminEmail : false}
           />
         ))}
         {others.map(user => (

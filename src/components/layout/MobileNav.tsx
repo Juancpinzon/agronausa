@@ -102,13 +102,33 @@ export default function MobileNav() {
                   </DrawerLink>
 
                   {isAdmin && (
-                    <DrawerLink
-                      to="/admin"
-                      onClick={close}
-                      accent
-                    >
-                      Panel Admin
-                    </DrawerLink>
+                    <>
+                      <DrawerLink
+                        to="/admin"
+                        onClick={close}
+                        accent
+                      >
+                        📊 Dashboard Admin
+                      </DrawerLink>
+                      <DrawerLink
+                        to="/admin/inventory"
+                        onClick={close}
+                      >
+                        📦 Inventario
+                      </DrawerLink>
+                      <DrawerLink
+                        to="/admin/orders"
+                        onClick={close}
+                      >
+                        🛒 Pedidos
+                      </DrawerLink>
+                      <DrawerLink
+                        to="/admin/alerts"
+                        onClick={close}
+                      >
+                        🔔 Alertas
+                      </DrawerLink>
+                    </>
                   )}
 
                   <button

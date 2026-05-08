@@ -96,6 +96,7 @@ export interface StockConflict {
 
 export interface UserProfile {
   id: string;
+  email?: string;
   full_name: string;
   phone: string;
   customer_type: "persona" | "negocio";

@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useInventory } from '../../hooks/useInventory';
 import useProducts from '../../hooks/useProducts';
+import { useSettings } from '../../hooks/useSettings';
 import { InventoryRow } from '../../components/admin/InventoryRow';
 import { StockAdjustModal } from '../../components/admin/StockAdjustModal';
 import { Product } from '../../types';
@@ -10,14 +11,14 @@ import { Skeleton } from '../../components/ui/SkeletonLoader';
 export default function Inventory() {
   const { products, loading: productsLoading, refreshProducts } = useProducts();
   const { adjustStock } = useInventory();
+  const { settings } = useSettings();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<'todos' | 'bajo' | 'agotado'>('todos');
   
   const [adjustProduct, setAdjustProduct] = useState<Product | null>(null);
 
-  // Default threshold a 10. Posteriormente podría venir de useSettings
-  const lowStockThreshold = 10; 
+  const lowStockThreshold = parseInt(settings?.low_stock_threshold || '10', 10); 
 
   const filteredProducts = useMemo(() => {
     return products.filter(p => {
