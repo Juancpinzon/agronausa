@@ -1,4 +1,5 @@
 # CLAUDE.md — TradeOS Personal
+
 ## Plataforma web de inversiones y trading NYSE + Cripto
 
 > **Agente**: Lee este archivo completo antes de escribir cualquier línea de código. Es tu contrato de comportamiento para todo el proyecto.
@@ -33,19 +34,19 @@ TradeOS Personal es una plataforma de inversiones y trading unificada para un us
 
 ## 🛠️ Stack Tecnológico
 
-| Capa | Tecnología | Razón |
-|------|-----------|-------|
-| Frontend | React 18 + TypeScript | SPA, tipado estricto |
-| Estilos | Tailwind CSS + shadcn/ui | Componentes financieros rápidos |
-| Backend/DB | Supabase (Postgres + Auth + Edge Functions) | Auth, storage seguro de keys, DB |
-| Broker NYSE | Alpaca Markets API | Paper + live trading NYSE/NASDAQ |
-| Broker Cripto | Binance API | Spot trading cripto |
-| Análisis IA | Claude API (claude-sonnet-4-20250514) | Research Agent + Screener IA |
-| Charts | Recharts + TradingView Widget (embed) | Equity chart + charts OHLCV por símbolo |
-| Estado | Zustand | Estado global liviano |
-| Fetching | TanStack Query (React Query) | Cache, refetch, loading states |
-| Build | Vite | Dev rápido |
-| Deploy | Vercel (preferido) o EasyPanel | CI/CD automático |
+| Capa          | Tecnología                                  | Razón                                   |
+| ------------- | ------------------------------------------- | --------------------------------------- |
+| Frontend      | React 18 + TypeScript                       | SPA, tipado estricto                    |
+| Estilos       | Tailwind CSS + shadcn/ui                    | Componentes financieros rápidos         |
+| Backend/DB    | Supabase (Postgres + Auth + Edge Functions) | Auth, storage seguro de keys, DB        |
+| Broker NYSE   | Alpaca Markets API                          | Paper + live trading NYSE/NASDAQ        |
+| Broker Cripto | Binance API                                 | Spot trading cripto                     |
+| Análisis IA   | Claude API (claude-sonnet-4-20250514)       | Research Agent + Screener IA            |
+| Charts        | Recharts + TradingView Widget (embed)       | Equity chart + charts OHLCV por símbolo |
+| Estado        | Zustand                                     | Estado global liviano                   |
+| Fetching      | TanStack Query (React Query)                | Cache, refetch, loading states          |
+| Build         | Vite                                        | Dev rápido                              |
+| Deploy        | Vercel (preferido) o EasyPanel              | CI/CD automático                        |
 
 ---
 
@@ -139,12 +140,12 @@ tradeos-personal/
 // --- USUARIOS Y CONFIGURACIÓN ---
 
 interface UserSettings {
-  id: string                        // uuid, FK → auth.users
-  alpaca_mode: 'paper' | 'live'    // SIEMPRE 'paper' en Fase 1
-  default_broker: 'alpaca' | 'binance'
-  risk_per_trade_pct: number        // % del portafolio por operación (default: 2)
-  created_at: Date
-  updated_at: Date
+  id: string; // uuid, FK → auth.users
+  alpaca_mode: "paper" | "live"; // SIEMPRE 'paper' en Fase 1
+  default_broker: "alpaca" | "binance";
+  risk_per_trade_pct: number; // % del portafolio por operación (default: 2)
+  created_at: Date;
+  updated_at: Date;
 }
 
 // Las API keys se guardan como Supabase Secrets (vault), NUNCA en tablas
@@ -152,155 +153,161 @@ interface UserSettings {
 // --- PORTAFOLIO ---
 
 interface Position {
-  id: string
-  user_id: string
-  broker: 'alpaca' | 'binance'
-  symbol: string
-  qty: number
-  avg_entry_price: number
-  current_price: number
-  market_value: number              // calculado: qty * current_price
-  unrealized_pnl: number            // calculado
-  unrealized_pnl_pct: number        // calculado
-  portfolio_weight_pct: number      // calculado: market_value / total_equity * 100
-  side: 'long' | 'short'
-  asset_class: 'equity' | 'crypto'
-  synced_at: Date
-  created_at: Date
+  id: string;
+  user_id: string;
+  broker: "alpaca" | "binance";
+  symbol: string;
+  qty: number;
+  avg_entry_price: number;
+  current_price: number;
+  market_value: number; // calculado: qty * current_price
+  unrealized_pnl: number; // calculado
+  unrealized_pnl_pct: number; // calculado
+  portfolio_weight_pct: number; // calculado: market_value / total_equity * 100
+  side: "long" | "short";
+  asset_class: "equity" | "crypto";
+  synced_at: Date;
+  created_at: Date;
 }
 
 interface EquitySnapshot {
-  id: string
-  user_id: string
-  broker: 'alpaca' | 'binance' | 'total'
-  equity: number
-  cash: number
-  buying_power: number
-  snapshot_at: Date
+  id: string;
+  user_id: string;
+  broker: "alpaca" | "binance" | "total";
+  equity: number;
+  cash: number;
+  buying_power: number;
+  snapshot_at: Date;
 }
 
 // --- ÓRDENES ---
 
 interface Order {
-  id: string
-  user_id: string
-  broker_order_id: string
-  broker: 'alpaca' | 'binance'
-  symbol: string
-  side: 'buy' | 'sell'
-  order_type: 'market' | 'limit' | 'stop' | 'stop_limit'
-  qty: number
-  limit_price?: number
-  stop_price?: number
-  filled_qty?: number
-  filled_avg_price?: number
-  status: 'pending' | 'accepted' | 'filled' | 'partially_filled' | 'cancelled' | 'rejected'
-  asset_class: 'equity' | 'crypto'
-  submitted_at: Date
-  filled_at?: Date
-  notes?: string
+  id: string;
+  user_id: string;
+  broker_order_id: string;
+  broker: "alpaca" | "binance";
+  symbol: string;
+  side: "buy" | "sell";
+  order_type: "market" | "limit" | "stop" | "stop_limit";
+  qty: number;
+  limit_price?: number;
+  stop_price?: number;
+  filled_qty?: number;
+  filled_avg_price?: number;
+  status:
+    | "pending"
+    | "accepted"
+    | "filled"
+    | "partially_filled"
+    | "cancelled"
+    | "rejected";
+  asset_class: "equity" | "crypto";
+  submitted_at: Date;
+  filled_at?: Date;
+  notes?: string;
 }
 
 // --- WATCHLIST ---
 
 interface WatchlistItem {
-  id: string
-  user_id: string
-  symbol: string
-  broker: 'alpaca' | 'binance'
-  asset_class: 'equity' | 'crypto'
-  alert_price_above?: number
-  alert_price_below?: number
-  notes?: string
-  added_at: Date
+  id: string;
+  user_id: string;
+  symbol: string;
+  broker: "alpaca" | "binance";
+  asset_class: "equity" | "crypto";
+  alert_price_above?: number;
+  alert_price_below?: number;
+  notes?: string;
+  added_at: Date;
 }
 
 // --- RESEARCH ---
 
 interface ResearchEntry {
-  id: string
-  user_id: string
-  symbol: string
-  query: string
-  analysis: string
-  data_used: ResearchDataSnapshot    // snapshot completo de datos usados
-  portfolio_context: PortfolioContext // exposición al símbolo en el momento del análisis
-  model: string                      // 'claude-sonnet-4-20250514'
-  created_at: Date
+  id: string;
+  user_id: string;
+  symbol: string;
+  query: string;
+  analysis: string;
+  data_used: ResearchDataSnapshot; // snapshot completo de datos usados
+  portfolio_context: PortfolioContext; // exposición al símbolo en el momento del análisis
+  model: string; // 'claude-sonnet-4-20250514'
+  created_at: Date;
 }
 
 interface ResearchDataSnapshot {
-  price: number
-  price_change_pct_1d: number
-  volume: number
-  volume_avg_30d: number
-  market_cap?: number
-  week_52_high: number               // para calcular distancia a ATH
-  week_52_low: number
-  ath_distance_pct: number           // calculado: (price - week_52_high) / week_52_high * 100
-  rsi_weekly?: number                // RSI semanal si disponible
-  eps_current?: number               // EPS último reportado
-  eps_next_estimate?: number         // EPS consenso próximo trimestre
-  revenue_growth_pct?: number        // crecimiento YoY
-  pe_ratio?: number
-  fetched_at: Date
+  price: number;
+  price_change_pct_1d: number;
+  volume: number;
+  volume_avg_30d: number;
+  market_cap?: number;
+  week_52_high: number; // para calcular distancia a ATH
+  week_52_low: number;
+  ath_distance_pct: number; // calculado: (price - week_52_high) / week_52_high * 100
+  rsi_weekly?: number; // RSI semanal si disponible
+  eps_current?: number; // EPS último reportado
+  eps_next_estimate?: number; // EPS consenso próximo trimestre
+  revenue_growth_pct?: number; // crecimiento YoY
+  pe_ratio?: number;
+  fetched_at: Date;
 }
 
 interface PortfolioContext {
-  has_position: boolean
-  qty?: number
-  avg_entry_price?: number
-  unrealized_pnl_pct?: number
-  portfolio_weight_pct?: number      // % del portafolio total que representa esta posición
+  has_position: boolean;
+  qty?: number;
+  avg_entry_price?: number;
+  unrealized_pnl_pct?: number;
+  portfolio_weight_pct?: number; // % del portafolio total que representa esta posición
 }
 
 // --- SCREENER ---
 
 interface ScreenerPreset {
-  id: string
-  user_id: string
-  name: string                       // ej: "Momentum Growth", "Breakout cerca de ATH"
-  criteria: ScreenerCriteria
-  last_run_at?: Date
-  created_at: Date
+  id: string;
+  user_id: string;
+  name: string; // ej: "Momentum Growth", "Breakout cerca de ATH"
+  criteria: ScreenerCriteria;
+  last_run_at?: Date;
+  created_at: Date;
 }
 
 interface ScreenerCriteria {
-  market_cap_min?: number            // en USD (ej: 2_000_000_000)
-  price_min?: number                 // precio mínimo por acción
-  revenue_growth_min_pct?: number    // crecimiento de ingresos YoY mínimo
-  volume_avg_min?: number            // volumen diario promedio mínimo
-  eps_next_positive: boolean         // EPS proyectado próximo año debe ser positivo
-  ath_distance_max_pct?: number      // máx % de distancia al máximo de 52 semanas (ej: 20)
-  rsi_weekly_min?: number            // RSI semanal mínimo
-  rsi_weekly_max?: number            // RSI semanal máximo
-  exclude_dividends?: boolean        // excluir empresas que pagan dividendos
-  asset_class: 'equity' | 'crypto' | 'both'
+  market_cap_min?: number; // en USD (ej: 2_000_000_000)
+  price_min?: number; // precio mínimo por acción
+  revenue_growth_min_pct?: number; // crecimiento de ingresos YoY mínimo
+  volume_avg_min?: number; // volumen diario promedio mínimo
+  eps_next_positive: boolean; // EPS proyectado próximo año debe ser positivo
+  ath_distance_max_pct?: number; // máx % de distancia al máximo de 52 semanas (ej: 20)
+  rsi_weekly_min?: number; // RSI semanal mínimo
+  rsi_weekly_max?: number; // RSI semanal máximo
+  exclude_dividends?: boolean; // excluir empresas que pagan dividendos
+  asset_class: "equity" | "crypto" | "both";
 }
 
 interface ScreenerResult {
-  id: string
-  user_id: string
-  preset_id?: string                 // FK → screener_presets (si se corrió desde un preset)
-  criteria: ScreenerCriteria
-  results: ScreenerResultItem[]
-  total_found: number
-  ai_summary?: string                // resumen Claude de los resultados más destacados
-  run_at: Date
+  id: string;
+  user_id: string;
+  preset_id?: string; // FK → screener_presets (si se corrió desde un preset)
+  criteria: ScreenerCriteria;
+  results: ScreenerResultItem[];
+  total_found: number;
+  ai_summary?: string; // resumen Claude de los resultados más destacados
+  run_at: Date;
 }
 
 interface ScreenerResultItem {
-  symbol: string
-  name: string
-  price: number
-  market_cap: number
-  revenue_growth_pct: number
-  ath_distance_pct: number           // negativo = está debajo del ATH
-  rsi_weekly?: number
-  eps_next_estimate?: number
-  volume_avg: number
-  score: number                      // 0-100 calculado por Claude según fit con criterios
-  ai_note?: string                   // nota breve de Claude sobre por qué destaca
+  symbol: string;
+  name: string;
+  price: number;
+  market_cap: number;
+  revenue_growth_pct: number;
+  ath_distance_pct: number; // negativo = está debajo del ATH
+  rsi_weekly?: number;
+  eps_next_estimate?: number;
+  volume_avg: number;
+  score: number; // 0-100 calculado por Claude según fit con criterios
+  ai_note?: string; // nota breve de Claude sobre por qué destaca
 }
 ```
 
@@ -309,6 +316,7 @@ interface ScreenerResultItem {
 ## 🔄 Flujos de Negocio Críticos
 
 ### Flujo 1: Ver estado del portafolio (< 2s)
+
 1. Usuario abre Dashboard
 2. `usePortfolio` lee `positions` y último `equity_snapshot` desde Supabase (cache React Query, stale 30s)
 3. Si los datos tienen > 60s, se dispara sync en background via Edge Function `alpaca-proxy`
@@ -316,6 +324,7 @@ interface ScreenerResultItem {
 5. Al completar sync, React Query invalida y re-renderiza
 
 ### Flujo 2: Ejecutar una orden (paper trading)
+
 1. Usuario selecciona símbolo en watchlist o posición
 2. Abre `OrderForm` → ingresa side, type, qty, precio (si aplica)
 3. Sistema calcula impacto: % del portafolio, valor aproximado
@@ -326,6 +335,7 @@ interface ScreenerResultItem {
 8. Posición actualizada en tabla `positions`
 
 ### Flujo 3: Research Agent (con contexto de portafolio)
+
 1. Usuario ingresa símbolo o pregunta en `ResearchPanel`
 2. Hook `useResearch` llama a Edge Function `claude-research`
 3. Edge Function ejecuta en paralelo:
@@ -344,6 +354,7 @@ interface ScreenerResultItem {
 7. Análisis guardado en `research_entries` con `data_used` y `portfolio_context`
 
 ### Flujo 4: Screener (buscar oportunidades)
+
 1. Usuario va a `/screener` y configura criterios en `ScreenerCriteriaForm`
 2. Puede cargar un preset guardado o crear criterios nuevos
 3. Hook `useScreener` llama a Edge Function `claude-screener`
@@ -357,6 +368,7 @@ interface ScreenerResultItem {
 7. Resultado guardado en `screener_results`; preset guardable para correr de nuevo
 
 ### Flujo 5: Configurar API keys (onboarding)
+
 1. Usuario va a Settings
 2. Ingresa keys de Alpaca (paper) y/o Binance
 3. Frontend llama a Edge Function `save-api-keys` que guarda en Supabase Vault
@@ -371,19 +383,19 @@ interface ScreenerResultItem {
 /* Tema dark trading — profesional, alta densidad de información */
 :root {
   /* Backgrounds */
-  --bg-base:      #0a0e17;
-  --bg-surface:   #111827;
-  --bg-elevated:  #1f2937;
-  --bg-hover:     #374151;
+  --bg-base: #0a0e17;
+  --bg-surface: #111827;
+  --bg-elevated: #1f2937;
+  --bg-hover: #374151;
 
   /* Texto */
-  --text-primary:   #f9fafb;
+  --text-primary: #f9fafb;
   --text-secondary: #9ca3af;
-  --text-muted:     #6b7280;
+  --text-muted: #6b7280;
 
   /* Semánticos financieros */
-  --color-profit:  #10b981;
-  --color-loss:    #ef4444;
+  --color-profit: #10b981;
+  --color-loss: #ef4444;
   --color-neutral: #6b7280;
   --color-warning: #f59e0b;
 
@@ -398,11 +410,13 @@ interface ScreenerResultItem {
 ```
 
 **Tipografía:**
+
 - Display/títulos: `Inter` (weight 600-700)
 - Cuerpo/UI: `Inter` (weight 400-500)
 - Números/precios: `JetBrains Mono` — siempre monospace
 
 **Reglas de densidad:**
+
 - Números de precio/PnL siempre en monospace
 - Positivo = `text-emerald-400`, negativo = `text-red-400`
 - Porcentajes con signo explícito: `+2.3%` / `-1.1%`
@@ -415,12 +429,14 @@ interface ScreenerResultItem {
 Al completar onboarding, precargar:
 
 **Watchlist default:**
+
 ```
 Equities (Alpaca):  AAPL, MSFT, NVDA, TSLA, SPY
 Cripto (Binance):   BTC/USDT, ETH/USDT, SOL/USDT
 ```
 
 **Screener presets default (2):**
+
 ```
 1. "Momentum Growth"
    - Market cap > $2B
@@ -521,6 +537,7 @@ SCREENER (/screener)
 ## ⚙️ Configuración Técnica
 
 **.env.example:**
+
 ```
 # Supabase
 VITE_SUPABASE_URL=
@@ -536,6 +553,7 @@ VITE_SUPABASE_ANON_KEY=
 ```
 
 **tsconfig.json — strict mode obligatorio:**
+
 ```json
 {
   "compilerOptions": {
@@ -625,6 +643,7 @@ VITE_SUPABASE_ANON_KEY=
 ## 🚨 Reglas de Código
 
 ### SIEMPRE:
+
 - TypeScript strict — `noImplicitAny` en todo
 - Acceder a Supabase solo desde hooks en `src/hooks/`; nunca directo en componentes
 - Todos los números financieros formateados con `formatCurrency()` o `formatPercent()` de `lib/formatters.ts`
@@ -636,6 +655,7 @@ VITE_SUPABASE_ANON_KEY=
 - El prompt de `claude-screener` debe recibir el portafolio actual del usuario para que Claude pueda identificar oportunidades que complementen (no dupliquen) las posiciones existentes
 
 ### NUNCA:
+
 - API keys de Alpaca, Binance o Anthropic en el frontend o en tablas de Supabase
 - Ejecutar órdenes sin pasar por `ConfirmOrderModal`
 - Llamadas directas a brokers externos desde el cliente (siempre via Edge Functions)
@@ -670,6 +690,58 @@ supabase db push
 # Deploy
 vercel --prod
 ```
+
+🔄 Instrucción de Auto-actualización
+
+Insertar esta sección en cualquier CLAUDE.md, preferiblemente al final antes del Roadmap.
+
+🔄 Cómo mantener este archivo actualizado
+Cuando el usuario diga cualquiera de estas frases:
+
+"Lee el git diff de los últimos commits y actualiza el archivo CLAUDE.md siguiendo las instrucciones de la sección 🔄 que está al final del archivo"
+"actualiza el CLAUDE.md con los cambios recientes"
+"sincroniza el CLAUDE.md con el git diff"
+"registra los cambios de esta sesión en el CLAUDE.md"
+
+Evitar frases cortas como "actualiza el md" — pueden ser interceptadas por el sistema de memoria automático de Claude Code.
+
+Ejecutar este flujo en orden:
+
+1. Leer el estado actual
+   bashcat CLAUDE.md
+   git log --oneline -10
+   git diff HEAD~1 --stat
+2. Leer el diff completo si hay cambios relevantes
+   bashgit diff HEAD~1
+3. Mapear cambios a secciones
+   Identificar qué secciones del CLAUDE.md se ven afectadas:
+
+Archivos nuevos en src/ → posible cambio en Estructura del Proyecto
+Archivos en supabase/migrations/ → actualizar Schema de Base de Datos
+Cambios en src/hooks/ o src/lib/ → posible cambio en Flujos o Reglas de Código
+Cambios en package.json → actualizar Stack Tecnológico
+Fases completadas → marcar [x] en Orden de Construcción
+
+4. Actualizar solo las secciones afectadas
+
+Marcar fases completadas con [x] o ✅
+Agregar tablas/campos nuevos al schema
+Registrar patrones nuevos en Reglas de Código
+NO reescribir secciones no afectadas
+NO cambiar los Principios Irrompibles sin confirmación
+
+5. Confirmar al usuario
+   CLAUDE.md actualizado. Cambios aplicados:
+
+- [sección]: [qué cambió]
+- [sección]: [qué cambió]
+  ⚠️ [inconsistencia si la hay]
+
+Nota para el agente: Si el diff es muy grande o cubre múltiples fases,
+pedir confirmación antes de hacer cambios estructurales al CLAUDE.md.
+
+NUNCA crear archivos de documentación separados.
+Todos los cambios van integrados en este CLAUDE.md, no en archivos externos.
 
 ---
 
