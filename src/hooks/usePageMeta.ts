@@ -28,7 +28,7 @@ export function usePageMeta(title: string, description?: string): void {
 
     // Restaurar título base al desmontar
     return () => {
-      document.title = `${BASE_TITLE} — Catálogo agropecuario B2C y B2B`;
+      document.title = `${BASE_TITLE} — Del campo colombiano a tu mesa`;
     };
   }, [title, description]);
 }

@@ -36,7 +36,7 @@ export default function ProductGrid({
         <Input
           label="Buscar producto"
           name="search"
-          placeholder="Ej. semilla, fertilizante, riego"
+          placeholder="Ej. queso, miel, huevos"
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
         />

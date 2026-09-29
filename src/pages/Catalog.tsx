@@ -29,7 +29,7 @@ export default function Catalog() {
 
   usePageMeta(
     "Catálogo de productos",
-    "Explora todos los insumos agrícolas, semillas, fertilizantes y herramientas de Agronausa. Sin registro requerido."
+    "Explora lácteos, mieles, frutas y verduras, hongos, huevos, panela, café y cacao de Agronausa. Sin registro requerido."
   );
 
   return (
@@ -41,7 +41,7 @@ export default function Catalog() {
           </p>
           <h1 className="font-display text-3xl font-bold text-text">Todos los productos</h1>
           <p className="mt-2 text-sm text-text-muted">
-            Explora productos agrícolas sin necesidad de iniciar sesión.
+            Explora productos frescos del campo sin necesidad de iniciar sesión.
           </p>
         </div>
         <div className="rounded-full border border-border bg-surface px-5 py-2.5 text-sm font-medium font-ui text-text-muted shadow-sm">

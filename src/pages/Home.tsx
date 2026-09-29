@@ -4,7 +4,7 @@ import { ROUTES } from "../lib/constants";
 import useProducts from "../hooks/useProducts";
 
 const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1600&q=85&auto=format&fit=crop";
+  "https://images.unsplash.com/photo-1500651230702-0e2d8a49d4ad?w=1600&q=85&auto=format&fit=crop";
 
 const CATEGORY_FALLBACKS: Record<string, string> = {
   "lácteos y quesos": "https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=400",
@@ -81,9 +81,9 @@ export default function Home() {
                 marginBottom: "0.5rem",
               }}
             >
-              Insumos del campo
+              Del campo colombiano
               <br />
-              <span className="text-accent italic">colombiano.</span>
+              <span className="text-accent italic">a tu mesa.</span>
             </h1>
           </div>
         </div>
