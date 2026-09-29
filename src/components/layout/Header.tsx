@@ -49,7 +49,6 @@ export default function Header() {
   const { user, profile, logout } = useAuth();
 
   const isAdmin =
-    (user?.user_metadata?.role as string | undefined) === "admin" ||
     (user?.app_metadata?.role as string | undefined) === "admin";
 
   return (

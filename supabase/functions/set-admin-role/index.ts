@@ -34,7 +34,7 @@ serve(async (req) => {
       });
     }
 
-    const role = user.user_metadata?.role;
+    const role = user.app_metadata?.role;
     if (role !== "admin") {
       return new Response(JSON.stringify({ error: "Forbidden: Admins only" }), { 
         status: 403, 
@@ -52,7 +52,7 @@ serve(async (req) => {
       
       const usersData = data.users.map(u => ({
         id: u.id,
-        role: u.user_metadata?.role ?? null
+        role: u.app_metadata?.role ?? null
       }));
 
       return new Response(JSON.stringify({ users: usersData }), {
@@ -67,12 +67,12 @@ serve(async (req) => {
       }
       
       const { data, error } = await supabaseAdmin.auth.admin.updateUserById(user_id, {
-        user_metadata: { role: is_admin ? 'admin' : null }
+        app_metadata: { role: is_admin ? 'admin' : null }
       });
 
       if (error) throw error;
 
-      return new Response(JSON.stringify({ success: true, user: { id: data.user.id, role: data.user.user_metadata?.role } }), {
+      return new Response(JSON.stringify({ success: true, user: { id: data.user.id, role: data.user.app_metadata?.role } }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" }
       });

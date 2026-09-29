@@ -9,7 +9,6 @@ export default function MobileNav() {
   const [open, setOpen] = useState(false);
 
   const isAdmin =
-    (user?.user_metadata?.role as string | undefined) === "admin" ||
     (user?.app_metadata?.role as string | undefined) === "admin";
 
   function close() {

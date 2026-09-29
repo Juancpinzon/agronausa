@@ -15,9 +15,8 @@ export default function AdminGuard({ children }: { children: ReactNode }) {
 
   if (!user) return <Navigate to="/login" replace />;
 
-  const role =
-    (user.user_metadata?.role as string | undefined) ??
-    (user.app_metadata?.role as string | undefined);
+  // El rol vive en app_metadata: solo el servidor puede escribirlo.
+  const role = user.app_metadata?.role as string | undefined;
 
   if (role !== "admin") return <Navigate to="/" replace />;
 
