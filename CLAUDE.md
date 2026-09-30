@@ -140,7 +140,7 @@ agronausa/
 > aquí.
 
 ```typescript
-// Extendido del user metadata de Supabase Auth
+// Tabla profiles, 1:1 con auth.users (el rol admin NO va aquí: vive en app_metadata)
 interface UserProfile {
   id: string                    // uuid — mismo que auth.users.id
   email?: string                // Sincronizado desde auth.users por handle_new_user()
@@ -268,7 +268,7 @@ interface ConsentRecord {
 
 // ─── Fase 7: módulos de operación ───
 
-// Historial de movimientos de inventario (solo admin, RLS por user_metadata.role)
+// Historial de movimientos de inventario (solo admin, RLS con public.is_admin())
 interface InventoryMovement {
   id: string
   product_id: string            // FK → products
@@ -442,8 +442,9 @@ interface FinancialSummary {
 1. Admin → Usuarios → `useAdminUsers` cruza `profiles` con la Edge Function
    `set-admin-role` (acción `list_users`), que usa service role para leer roles
 2. La función verifica que quien llama sea admin (401 sin sesión, 403 sin rol)
-3. Asignar o quitar admin escribe `user_metadata.role`, que es exactamente lo
-   que leen las policies RLS (`auth.jwt() -> 'user_metadata' ->> 'role'`)
+3. Asignar o quitar admin escribe `app_metadata.role`, que es exactamente lo
+   que leen las policies RLS a través de `public.is_admin()`
+   (`auth.jwt() -> 'app_metadata' ->> 'role'`)
 4. Si la Edge Function falla, la pantalla degrada a mostrar solo los perfiles
 
 ---
@@ -530,7 +531,7 @@ ambos o decidir cuál se elimina.
 
 **Usuario admin (1):**
 El rol se asigna desde `/admin/users` vía la Edge Function `set-admin-role`, que
-escribe `user_metadata.role = 'admin'`. `ADMIN_EMAIL` del `.env` ya no se usa en
+escribe `app_metadata.role = 'admin'`. `ADMIN_EMAIL` del `.env` ya no se usa en
 el código: el correo de contacto vive en `app_settings.admin_email`.
 
 **Hook de seed:**
@@ -733,12 +734,13 @@ en `src/`: el nombre real sale de `app_settings.site_name`.
 - [ ] `order_number` se genera con `count(*)`: dos pedidos simultáneos chocan contra el `unique`
 - [ ] `ConsentCheckboxes` enlaza a `/politica-privacidad`; la ruta real es `/politica-de-privacidad` → cae en `*`
 - [ ] `policy_version` hardcodeado en el checkout en vez de leer `app_settings.terms_version`
-- [ ] `AdminGuard` / `Header` / `MobileNav` aceptan `app_metadata.role`, que la RLS ignora
+- [x] Rol admin movido a `app_metadata` en RLS, `AdminGuard`, `Header`, `MobileNav` y `set-admin-role` (migración `20260929000000_admin_role_app_metadata.sql`)
+- [ ] La Edge Function `set-admin-role` está en el repo pero no desplegada en producción: `/admin/users` no puede listar ni asignar roles
 - [ ] `any` usado en 18 puntos (hooks de Fase 7 y páginas de admin), contra la regla del proyecto
 - [ ] `Account.tsx` es la única página que llama a `supabase` directo, sin hook
 - [ ] Reglas de touch incumplidas: `Button` ~44px, +/- de 40px en `Cart` y 32px en `CartDrawer`
 - [ ] `service_notes` es una clave fantasma: la RLS la excluye pero no existe en ningún lado
-- [ ] Textos heredados del catálogo de insumos: mockup de HOME y meta description de `Catalog.tsx`
+- [x] Textos heredados del catálogo de insumos: meta tags, hero, buscador y meta description de `Catalog.tsx`
 
 ---
 
@@ -761,11 +763,10 @@ en `src/`: el nombre real sale de `app_settings.site_name`.
 - No usar `useEffect` para lógica de negocio — usar hooks dedicados
 - No insertar órdenes ni `consent_records` desde el cliente — eso es de `create-order`
 - No cambiar roles desde el cliente — eso es de `set-admin-role`
-- No leer el rol admin de otro lugar que no sea `user_metadata.role` — es lo único
-  que evalúan las policies RLS.
-  ⚠️ Hoy `AdminGuard`, `Header` y `MobileNav` aceptan también `app_metadata.role`:
-  un usuario así entra al panel pero **todas sus queries RLS fallan**. Alinear el
-  frontend con la RLS, no al revés.
+- No leer ni escribir el rol admin en `user_metadata`: cualquier usuario puede
+  editarlo con `supabase.auth.updateUser` y darse permisos de admin. El rol vive
+  en `app_metadata.role` (solo lo escribe el servidor), y las policies RLS lo
+  evalúan con `public.is_admin()`. Frontend y RLS deben leer lo mismo.
 
 ---
 
