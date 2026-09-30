@@ -42,14 +42,14 @@ async function setAdmin() {
   console.log(`Found user: ${user.id}. Setting admin role...`)
   
   const { data, error } = await supabase.auth.admin.updateUserById(user.id, {
-    user_metadata: { role: 'admin' }
+    app_metadata: { role: 'admin' }
   })
 
   if (error) {
     console.error('Error updating user:', error)
   } else {
     console.log('Success! User demo@agro.com is now an admin.')
-    console.log('Metadata:', data.user.user_metadata)
+    console.log('Metadata:', data.user.app_metadata)
   }
 }
 

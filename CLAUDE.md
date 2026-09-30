@@ -41,7 +41,7 @@
 | Routing | React Router v6 | Rutas públicas + rutas anidadas de admin |
 | Estilos | Tailwind CSS v3 | Consistencia visual con BSM, velocidad de desarrollo |
 | Backend / DB | Supabase (PostgreSQL) | Auth, RLS, storage para imágenes de productos |
-| Auth | Supabase Auth | Registro por email, diferenciación de rol en user metadata |
+| Auth | Supabase Auth | Registro por email; rol admin en `app_metadata` (solo lo escribe el servidor) |
 | Imágenes | Supabase Storage | Fotos de productos subidas por David desde el admin |
 | Deploy | Vercel | Dominio propio de Agronausa, preview por branch |
 | Lógica sensible | Supabase Edge Functions (Deno) | Crear pedidos y asignar roles con service role, fuera del cliente |
@@ -342,7 +342,7 @@ interface FinancialSummary {
 ## 🔄 Flujos de Negocio Críticos
 
 ### Flujo 1: Cliente explora y hace un pedido (sin cuenta)
-1. Entra a agronausa.com — ve catálogo sin login
+1. Entra a agronausa.vercel.app — ve catálogo sin login
 2. Filtra por categoría o busca producto
 3. Agrega al carrito (persiste en localStorage con snapshot de nombre, precio, unidad e imagen)
 4. Va a checkout → ingresa nombre, email, teléfono, dirección
@@ -693,7 +693,7 @@ en `src/`: el nombre real sale de `app_settings.site_name`.
 - [x] **Criterio de éxito:** Un usuario B2B ve su precio especial en el catálogo, un B2C ve el precio base
 
 ### Fase 5: Panel Admin (Día 5-6)
-- [x] Guard de ruta admin (solo si `role === 'admin'`)
+- [x] Guard de ruta admin (solo si `app_metadata.role === 'admin'`)
 - [x] Dashboard con métricas básicas: pedidos hoy, ingresos del mes, productos con bajo stock
 - [x] `Orders.tsx`: listado con filtros por estado, detalle de pedido, cambio de estado
 - [x] `Products.tsx`: listado, formulario crear/editar, subida de imágenes a Supabase Storage
@@ -706,7 +706,7 @@ en `src/`: el nombre real sale de `app_settings.site_name`.
 - [x] Botón flotante "Consultar por WhatsApp" (usa `VITE_WHATSAPP_NUMBER`)
 - [x] Estados vacíos, loading skeletons, manejo de errores en UI
 - [x] Responsive final pass: revisar todo en 375px
-- [x] Deploy en Vercel con dominio agronausa.com
+- [x] Deploy en Vercel (agronausa.vercel.app; dominio agronausa.com pendiente)
 - [x] **Criterio de éxito:** El sitio está publicado, David puede acceder al admin, el primer pedido de prueba funciona
 
 ### Fase 7: Módulos de operación (post-MVP)
@@ -750,6 +750,7 @@ en `src/`: el nombre real sale de `app_settings.site_name`.
 - Formatear precios con `formatCOP(price)` — nunca template literals crudos
 - Validar stock antes de crear un pedido
 - RLS activado en todas las tablas desde el día 1
+- Las políticas de admin usan `public.is_admin()`, que lee `app_metadata.role` del JWT
 - Los snapshots de pedido (nombre, precio) son inmutables después de creado — nunca join vivo con productos
 
 **NUNCA:**
